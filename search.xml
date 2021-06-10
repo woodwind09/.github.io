@@ -278,33 +278,6 @@
     
     
     <entry>
-      <title>STM32 C编程入门记录 Timers(下)</title>
-      <link href="/2019/08/02/STM32(2)/"/>
-      <url>/2019/08/02/STM32(2)/</url>
-      
-        <content type="html"><![CDATA[<h1 id="简单介绍"><a href="#简单介绍" class="headerlink" title="简单介绍"></a>简单介绍</h1><p>在上篇文章中讲述了如何把GPIO的端口绑定到TIM上，接下来讲一下如何设置TIM的配置。</p><span id="more"></span><h2 id="过程总览"><a href="#过程总览" class="headerlink" title="过程总览"></a>过程总览</h2><p>– 设置prescaler（预分频器）<br>– 设置the auto-reload（自动重制）<br>– 设置direction/mode of the counter（计数的方向）<br>– 设置output compare mode（输出选择比较方式）<br>– 打开频道连接到端口<br>– 打开 timer的计数器</p><h3 id="1-预分频器"><a href="#1-预分频器" class="headerlink" title="1.预分频器"></a>1.预分频器</h3><p>预分频器就是重复一个计数轮回的次数。代码表述如下：<br>    TIM3-&gt;PSC = 12000 – 1;//重复轮回的次数为12000，因为是从0 开始的所以0-11999为12000.<br>由于TIM的最大频率是48Mhz，所以要得到想要的频率，就要通过运算得知预分频器和计数的值。<br>下面是公式<br>想要的频率 = 48 000 000 / （（TIM3-&gt;PSC + 1 ）*（TIM3-&gt;ARR + 1 ）</p><p>TIM3-&gt;ARR这个会在接下来进行介绍。</p><h3 id="2-自动重制"><a href="#2-自动重制" class="headerlink" title="2.自动重制"></a>2.自动重制</h3><p>自动重制的值为一个计数器从0数到的值。代表计数器达到这个值以后下一位就会清零。<br><code>TIM3-&gt;ARR = 4000 – 1;</code><br>`和上面的代码结合起来就可以了解到，这两个值和想到得到的TIM频率的乘积就是TIM的最大乘积48Mhz。</p><h3 id="3-计数器初始值"><a href="#3-计数器初始值" class="headerlink" title="3.计数器初始值"></a>3.计数器初始值</h3><p>这个值决定了计数器的开始值，通过改变不同频道的初始值可以让相同事件以不同的时间但是相同的频率运行。<br>    TIM3-&gt;CCR3 = 3456;<br>`当一个完整的频率完成的时候，将会输出一个CK_CNT给输出</p><h3 id="4-输出的模式"><a href="#4-输出的模式" class="headerlink" title="4.输出的模式"></a>4.输出的模式</h3><p>stm32TIM输出的模式大概主要的有8种：通过不同的凡是输出的信号也会有不同。<br>0000: 输出冻结，没有任何事发生。<br>0001: 当CNT（计数比较值）的值等于计数的值，输出将变成高平电压。<br>0010: 当CNT的值（计数比较值）的值等于计数的值，输出将变成低平电压。<br>0011: 当CNT的值（计数比较值）的值等于计数的值，输出将与当前相反。<br>0100: 强制低平电压，且永远不会发生改变。<br>0101: 强制高平电压，且永远不会发生改变。<br>0110: PWM输出模式1，如果计数是往上数的，如果自己当得到的频率的值小于计数的值，高平电压。其他的低平电压。<br>如果计数是往下数的，如果自己当得到的频率的值大于计数的值，高平电压。其他的低平电压<br>0111: PWM输出模式2，如果计数是往上数的，如果自己当得到的频率的值大于等于计数的值，高平电压。其他的低平电压。<br>如果计数是往下数的，如果自己当得到的频率的值大于计数的值，高平电压。其他的低平电压。</p><p>然后模式的选择在输出比较模式的寄存器。<br>代码如下:</p><h5 id="举例：选择0011"><a href="#举例：选择0011" class="headerlink" title="举例：选择0011"></a>举例：选择0011</h5><pre><code>TIM3-&gt;CCMR2 &amp;= TIMCCMR2_OC3M2; //把位数2的值清零，因为有可能先前赋的值没有清零。TIM3-&gt;CCMR2 |= TIM_CCMR2_OC3M_1 | TIM_CCMR2_OC3M_0;//给位数1，0的值清零，因为有可能先前赋的值没有清零。</code></pre><h3 id="5-启动"><a href="#5-启动" class="headerlink" title="5. 启动"></a>5. 启动</h3><p>当上面的配置设置好了以后，就可以启动计数器了，让TIM生效。</p><p>以上就是stm32 TIM功能的介绍及实现。</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> STM32 TIMER </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> STM32 </tag>
-            
-            <tag> C - TIMER </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>Pyqt5 textbox中识别整数与小数无报错办法</title>
       <link href="/2019/08/02/Pyqt5_whaterever_datatype/"/>
       <url>/2019/08/02/Pyqt5_whaterever_datatype/</url>
@@ -350,11 +323,38 @@
       
         <tags>
             
-            <tag> STM32 </tag>
-            
             <tag> C </tag>
             
             <tag> TIMER </tag>
+            
+            <tag> STM32 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>STM32 C编程入门记录 Timers(下)</title>
+      <link href="/2019/08/02/STM32(2)/"/>
+      <url>/2019/08/02/STM32(2)/</url>
+      
+        <content type="html"><![CDATA[<h1 id="简单介绍"><a href="#简单介绍" class="headerlink" title="简单介绍"></a>简单介绍</h1><p>在上篇文章中讲述了如何把GPIO的端口绑定到TIM上，接下来讲一下如何设置TIM的配置。</p><span id="more"></span><h2 id="过程总览"><a href="#过程总览" class="headerlink" title="过程总览"></a>过程总览</h2><p>– 设置prescaler（预分频器）<br>– 设置the auto-reload（自动重制）<br>– 设置direction/mode of the counter（计数的方向）<br>– 设置output compare mode（输出选择比较方式）<br>– 打开频道连接到端口<br>– 打开 timer的计数器</p><h3 id="1-预分频器"><a href="#1-预分频器" class="headerlink" title="1.预分频器"></a>1.预分频器</h3><p>预分频器就是重复一个计数轮回的次数。代码表述如下：<br>    TIM3-&gt;PSC = 12000 – 1;//重复轮回的次数为12000，因为是从0 开始的所以0-11999为12000.<br>由于TIM的最大频率是48Mhz，所以要得到想要的频率，就要通过运算得知预分频器和计数的值。<br>下面是公式<br>想要的频率 = 48 000 000 / （（TIM3-&gt;PSC + 1 ）*（TIM3-&gt;ARR + 1 ）</p><p>TIM3-&gt;ARR这个会在接下来进行介绍。</p><h3 id="2-自动重制"><a href="#2-自动重制" class="headerlink" title="2.自动重制"></a>2.自动重制</h3><p>自动重制的值为一个计数器从0数到的值。代表计数器达到这个值以后下一位就会清零。<br><code>TIM3-&gt;ARR = 4000 – 1;</code><br>`和上面的代码结合起来就可以了解到，这两个值和想到得到的TIM频率的乘积就是TIM的最大乘积48Mhz。</p><h3 id="3-计数器初始值"><a href="#3-计数器初始值" class="headerlink" title="3.计数器初始值"></a>3.计数器初始值</h3><p>这个值决定了计数器的开始值，通过改变不同频道的初始值可以让相同事件以不同的时间但是相同的频率运行。<br>    TIM3-&gt;CCR3 = 3456;<br>`当一个完整的频率完成的时候，将会输出一个CK_CNT给输出</p><h3 id="4-输出的模式"><a href="#4-输出的模式" class="headerlink" title="4.输出的模式"></a>4.输出的模式</h3><p>stm32TIM输出的模式大概主要的有8种：通过不同的凡是输出的信号也会有不同。<br>0000: 输出冻结，没有任何事发生。<br>0001: 当CNT（计数比较值）的值等于计数的值，输出将变成高平电压。<br>0010: 当CNT的值（计数比较值）的值等于计数的值，输出将变成低平电压。<br>0011: 当CNT的值（计数比较值）的值等于计数的值，输出将与当前相反。<br>0100: 强制低平电压，且永远不会发生改变。<br>0101: 强制高平电压，且永远不会发生改变。<br>0110: PWM输出模式1，如果计数是往上数的，如果自己当得到的频率的值小于计数的值，高平电压。其他的低平电压。<br>如果计数是往下数的，如果自己当得到的频率的值大于计数的值，高平电压。其他的低平电压<br>0111: PWM输出模式2，如果计数是往上数的，如果自己当得到的频率的值大于等于计数的值，高平电压。其他的低平电压。<br>如果计数是往下数的，如果自己当得到的频率的值大于计数的值，高平电压。其他的低平电压。</p><p>然后模式的选择在输出比较模式的寄存器。<br>代码如下:</p><h5 id="举例：选择0011"><a href="#举例：选择0011" class="headerlink" title="举例：选择0011"></a>举例：选择0011</h5><pre><code>TIM3-&gt;CCMR2 &amp;= TIMCCMR2_OC3M2; //把位数2的值清零，因为有可能先前赋的值没有清零。TIM3-&gt;CCMR2 |= TIM_CCMR2_OC3M_1 | TIM_CCMR2_OC3M_0;//给位数1，0的值清零，因为有可能先前赋的值没有清零。</code></pre><h3 id="5-启动"><a href="#5-启动" class="headerlink" title="5. 启动"></a>5. 启动</h3><p>当上面的配置设置好了以后，就可以启动计数器了，让TIM生效。</p><p>以上就是stm32 TIM功能的介绍及实现。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> STM32 TIMER </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> STM32 </tag>
+            
+            <tag> C - TIMER </tag>
             
         </tags>
       
