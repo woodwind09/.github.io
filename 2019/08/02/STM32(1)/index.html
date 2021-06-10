@@ -20,18 +20,18 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="介绍Tim的用途：在stm32里常常需要用Timer来决定一件事项的频率。最简单的例子，如果想让一个LED灯已一个频率闪烁，就要用Tim来确认频率。那接下来就要介绍一下如何建立一个Tim的计时器。 过程介绍1.选择计时器首先在I&#x2F;Opin中，我们暂时只能设置输入与输出。alternative和analog mode还没有涉及，参照下图。首先我们要用一个general-purpose的pin连接到T">
+  <meta name="description" content="介绍Tim的用途：在stm32里常常需要用Timer来决定一件事项的频率。最简单的例子，如果想让一个LED灯已一个频率闪烁，就要用Tim来确认频率。那接下来就要介绍一下如何建立一个Tim的计时器。  过程介绍1.选择计时器">
 <meta property="og:type" content="article">
 <meta property="og:title" content="STM32 C编程入门记录 Timers(上)">
 <meta property="og:url" content="http://example.com/2019/08/02/STM32(1)/index.html">
 <meta property="og:site_name" content="Woodwind">
-<meta property="og:description" content="介绍Tim的用途：在stm32里常常需要用Timer来决定一件事项的频率。最简单的例子，如果想让一个LED灯已一个频率闪烁，就要用Tim来确认频率。那接下来就要介绍一下如何建立一个Tim的计时器。 过程介绍1.选择计时器首先在I&#x2F;Opin中，我们暂时只能设置输入与输出。alternative和analog mode还没有涉及，参照下图。首先我们要用一个general-purpose的pin连接到T">
+<meta property="og:description" content="介绍Tim的用途：在stm32里常常需要用Timer来决定一件事项的频率。最简单的例子，如果想让一个LED灯已一个频率闪烁，就要用Tim来确认频率。那接下来就要介绍一下如何建立一个Tim的计时器。  过程介绍1.选择计时器">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://img-blog.csdnimg.cn/20190407085943770.jpg">
 <meta property="og:image" content="https://img-blog.csdnimg.cn/20190407091823489.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDA4MDIxMg==,size_16,color_FFFFFF,t_70">
 <meta property="og:image" content="https://img-blog.csdnimg.cn/20190407092049235.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDA4MDIxMg==,size_16,color_FFFFFF,t_70">
 <meta property="article:published_time" content="2019-08-02T05:59:00.000Z">
-<meta property="article:modified_time" content="2020-05-27T05:58:07.000Z">
+<meta property="article:modified_time" content="2021-06-10T08:21:57.765Z">
 <meta property="article:author" content="Woodwind">
 <meta property="article:tag" content="STM32">
 <meta property="article:tag" content="C">
@@ -223,7 +223,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-27 13:58:07" itemprop="dateModified" datetime="2020-05-27T13:58:07+08:00">2020-05-27</time>
+                <time title="修改时间：2021-06-10 16:21:57" itemprop="dateModified" datetime="2021-06-10T16:21:57+08:00">2021-06-10</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -275,6 +275,7 @@
 
       
         <h2 id="介绍Tim的用途："><a href="#介绍Tim的用途：" class="headerlink" title="介绍Tim的用途："></a>介绍Tim的用途：</h2><p>在stm32里常常需要用Timer来决定一件事项的频率。最简单的例子，如果想让一个LED灯已一个频率闪烁，就要用Tim来确认频率。那接下来就要介绍一下如何建立一个Tim的计时器。</p>
+<span id="more"></span>
 <h2 id="过程介绍"><a href="#过程介绍" class="headerlink" title="过程介绍"></a>过程介绍</h2><h3 id="1-选择计时器"><a href="#1-选择计时器" class="headerlink" title="1.选择计时器"></a>1.选择计时器</h3><p>首先在I/Opin中，我们暂时只能设置输入与输出。alternative和analog mode还没有涉及，参照下图。<br><img src="https://img-blog.csdnimg.cn/20190407085943770.jpg" alt="这是stm32 reference book上的内容"><br>首先我们要用一个general-purpose的pin连接到Tim，所以这里就不再是输入与输出的结果，而是alternate function mode。</p>
 <h3 id="举例"><a href="#举例" class="headerlink" title="举例"></a>举例</h3><p>首先打开 I/O port C clock才能给PC中的pin赋值。<br>假设我们要设置PC8为Tim3的启动pin</p>
 <p>RCC-&gt;AHBENR |= RCC_AHBENR_GPIOCEN;//1<br>GPIOC-&gt;MODER &amp;= (3 &lt;&lt;(2  8));//2<br>GPIOC-&gt;MODER |= 2 &lt;&lt;(2 * 8);//3<br>GPIOC-&gt;AFR[1] &amp;= (15&lt;&lt;(48));//4</p>
