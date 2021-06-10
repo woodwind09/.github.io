@@ -278,35 +278,6 @@
     
     
     <entry>
-      <title>STM32 C编程入门记录 Timers(上)</title>
-      <link href="/2019/08/02/STM32(1)/"/>
-      <url>/2019/08/02/STM32(1)/</url>
-      
-        <content type="html"><![CDATA[<h2 id="介绍Tim的用途："><a href="#介绍Tim的用途：" class="headerlink" title="介绍Tim的用途："></a>介绍Tim的用途：</h2><p>在stm32里常常需要用Timer来决定一件事项的频率。最简单的例子，如果想让一个LED灯已一个频率闪烁，就要用Tim来确认频率。那接下来就要介绍一下如何建立一个Tim的计时器。</p><h2 id="过程介绍"><a href="#过程介绍" class="headerlink" title="过程介绍"></a>过程介绍</h2><h3 id="1-选择计时器"><a href="#1-选择计时器" class="headerlink" title="1.选择计时器"></a>1.选择计时器</h3><p>首先在I/Opin中，我们暂时只能设置输入与输出。alternative和analog mode还没有涉及，参照下图。<br><img src="https://img-blog.csdnimg.cn/20190407085943770.jpg" alt="这是stm32 reference book上的内容"><br>首先我们要用一个general-purpose的pin连接到Tim，所以这里就不再是输入与输出的结果，而是alternate function mode。</p><h3 id="举例"><a href="#举例" class="headerlink" title="举例"></a>举例</h3><p>首先打开 I/O port C clock才能给PC中的pin赋值。<br>假设我们要设置PC8为Tim3的启动pin</p><p>RCC-&gt;AHBENR |= RCC_AHBENR_GPIOCEN;//1<br>GPIOC-&gt;MODER &amp;= (3 &lt;&lt;(2  8));//2<br>GPIOC-&gt;MODER |= 2 &lt;&lt;(2 * 8);//3<br>GPIOC-&gt;AFR[1] &amp;= (15&lt;&lt;(48));//4</p><p>1.打开所有GPIOC的pin.<br>2.因为下面要给PC8赋值，所以要先清空原来的数值，否则原来数字或等于10结果可能不为10.ex.10|11=11～=10.<br>3.在上图表格中在moder中一个pin占据两位，moder8在第16位，所以向右移8*2位并赋予二进制10也就是2<br>因为不能改变其他位数上的值所以用“|=”“或”来赋值<br>4.这一步要给把pc8绑定到tim3.<br>需要查datasheet。<br><img src="https://img-blog.csdnimg.cn/20190407091823489.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDA4MDIxMg==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>因为pc8对应的alternate function 只有一个就不需要再次查表来，再查reference book 中AFR的部分。<br><img src="https://img-blog.csdnimg.cn/20190407092049235.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDA4MDIxMg==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>因为PC8中的8大于7，所以它属于AFRH组。又因为PC8只有一个alternate function。<br>所以只有赋予0000就行，也就是～（1111）就行了。<br>至此就把PC8和Tim3channel3关联了。<br>接下来就是如何选择Tim3的一些事项，下篇再讲。</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> STM32 TIMER </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> C </tag>
-            
-            <tag> TIMER </tag>
-            
-            <tag> STM32 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>Pyqt5 textbox中识别整数与小数无报错办法</title>
       <link href="/2019/08/02/Pyqt5_whaterever_datatype/"/>
       <url>/2019/08/02/Pyqt5_whaterever_datatype/</url>
@@ -355,6 +326,35 @@
             <tag> STM32 </tag>
             
             <tag> C - TIMER </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>STM32 C编程入门记录 Timers(上)</title>
+      <link href="/2019/08/02/STM32(1)/"/>
+      <url>/2019/08/02/STM32(1)/</url>
+      
+        <content type="html"><![CDATA[<h2 id="介绍Tim的用途："><a href="#介绍Tim的用途：" class="headerlink" title="介绍Tim的用途："></a>介绍Tim的用途：</h2><p>在stm32里常常需要用Timer来决定一件事项的频率。最简单的例子，如果想让一个LED灯已一个频率闪烁，就要用Tim来确认频率。那接下来就要介绍一下如何建立一个Tim的计时器。</p><h2 id="过程介绍"><a href="#过程介绍" class="headerlink" title="过程介绍"></a>过程介绍</h2><h3 id="1-选择计时器"><a href="#1-选择计时器" class="headerlink" title="1.选择计时器"></a>1.选择计时器</h3><p>首先在I/Opin中，我们暂时只能设置输入与输出。alternative和analog mode还没有涉及，参照下图。<br><img src="https://img-blog.csdnimg.cn/20190407085943770.jpg" alt="这是stm32 reference book上的内容"><br>首先我们要用一个general-purpose的pin连接到Tim，所以这里就不再是输入与输出的结果，而是alternate function mode。</p><h3 id="举例"><a href="#举例" class="headerlink" title="举例"></a>举例</h3><p>首先打开 I/O port C clock才能给PC中的pin赋值。<br>假设我们要设置PC8为Tim3的启动pin</p><p>RCC-&gt;AHBENR |= RCC_AHBENR_GPIOCEN;//1<br>GPIOC-&gt;MODER &amp;= (3 &lt;&lt;(2  8));//2<br>GPIOC-&gt;MODER |= 2 &lt;&lt;(2 * 8);//3<br>GPIOC-&gt;AFR[1] &amp;= (15&lt;&lt;(48));//4</p><p>1.打开所有GPIOC的pin.<br>2.因为下面要给PC8赋值，所以要先清空原来的数值，否则原来数字或等于10结果可能不为10.ex.10|11=11～=10.<br>3.在上图表格中在moder中一个pin占据两位，moder8在第16位，所以向右移8*2位并赋予二进制10也就是2<br>因为不能改变其他位数上的值所以用“|=”“或”来赋值<br>4.这一步要给把pc8绑定到tim3.<br>需要查datasheet。<br><img src="https://img-blog.csdnimg.cn/20190407091823489.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDA4MDIxMg==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>因为pc8对应的alternate function 只有一个就不需要再次查表来，再查reference book 中AFR的部分。<br><img src="https://img-blog.csdnimg.cn/20190407092049235.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDA4MDIxMg==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>因为PC8中的8大于7，所以它属于AFRH组。又因为PC8只有一个alternate function。<br>所以只有赋予0000就行，也就是～（1111）就行了。<br>至此就把PC8和Tim3channel3关联了。<br>接下来就是如何选择Tim3的一些事项，下篇再讲。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> STM32 TIMER </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> STM32 </tag>
+            
+            <tag> C </tag>
+            
+            <tag> TIMER </tag>
             
         </tags>
       
