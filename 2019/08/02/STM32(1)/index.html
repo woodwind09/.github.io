@@ -20,18 +20,18 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="介绍Tim的用途：在stm32里常常需要用Timer来决定一件事项的频率。最简单的例子，如果想让一个LED灯已一个频率闪烁，就要用Tim来确认频率。那接下来就要介绍一下如何建立一个Tim的计时器。  过程介绍1.选择计时器">
+  <meta name="description" content="嵌入式Timer介绍1">
 <meta property="og:type" content="article">
 <meta property="og:title" content="STM32 C编程入门记录 Timers(上)">
 <meta property="og:url" content="http://example.com/2019/08/02/STM32(1)/index.html">
 <meta property="og:site_name" content="Woodwind">
-<meta property="og:description" content="介绍Tim的用途：在stm32里常常需要用Timer来决定一件事项的频率。最简单的例子，如果想让一个LED灯已一个频率闪烁，就要用Tim来确认频率。那接下来就要介绍一下如何建立一个Tim的计时器。  过程介绍1.选择计时器">
+<meta property="og:description" content="嵌入式Timer介绍1">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://img-blog.csdnimg.cn/20190407085943770.jpg">
 <meta property="og:image" content="https://img-blog.csdnimg.cn/20190407091823489.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDA4MDIxMg==,size_16,color_FFFFFF,t_70">
 <meta property="og:image" content="https://img-blog.csdnimg.cn/20190407092049235.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NDA4MDIxMg==,size_16,color_FFFFFF,t_70">
 <meta property="article:published_time" content="2019-08-02T05:59:00.000Z">
-<meta property="article:modified_time" content="2021-06-10T08:21:57.765Z">
+<meta property="article:modified_time" content="2021-06-11T12:56:07.745Z">
 <meta property="article:author" content="Woodwind">
 <meta property="article:tag" content="C">
 <meta property="article:tag" content="TIMER">
@@ -223,7 +223,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-06-10 16:21:57" itemprop="dateModified" datetime="2021-06-10T16:21:57+08:00">2021-06-10</time>
+                <time title="修改时间：2021-06-11 20:56:07" itemprop="dateModified" datetime="2021-06-11T20:56:07+08:00">2021-06-11</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -264,6 +264,7 @@
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
               <span>1 分钟</span>
             </span>
+            <div class="post-description">嵌入式Timer介绍1</div>
 
         </div>
       </header>
@@ -380,20 +381,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-count">18</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-count">12</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-count">27</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -442,7 +443,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">57k</span>
+    <span title="站点总字数">58k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>

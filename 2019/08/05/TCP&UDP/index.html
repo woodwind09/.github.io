@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="简单介绍一般而言，路由器的作用是把不同网段的内网外网进行连接，进行传输数据。因为绝大多数内网IP地址很可能是相同的。相对而言，一个IP地址其实是一个设备的一个标识。那如果那么多设备的IP地址一样，那服务器还怎么区分需要输送数据到那台设备呢。所以这时候就需要路由器，给需要访问外网的内网设备一个处理过的IP地址。  举例1有些朋友可能在家里配置过家里的路由器，一般而言进入路由器地址进行配置的IP是19">
+  <meta name="description" content="计算机网络TCP和UDP应用。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="TCP &amp; UDP 局域网应用">
 <meta property="og:url" content="http://example.com/2019/08/05/TCP&UDP/index.html">
 <meta property="og:site_name" content="Woodwind">
-<meta property="og:description" content="简单介绍一般而言，路由器的作用是把不同网段的内网外网进行连接，进行传输数据。因为绝大多数内网IP地址很可能是相同的。相对而言，一个IP地址其实是一个设备的一个标识。那如果那么多设备的IP地址一样，那服务器还怎么区分需要输送数据到那台设备呢。所以这时候就需要路由器，给需要访问外网的内网设备一个处理过的IP地址。  举例1有些朋友可能在家里配置过家里的路由器，一般而言进入路由器地址进行配置的IP是19">
+<meta property="og:description" content="计算机网络TCP和UDP应用。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://res.cloudinary.com/djyodckal/image/upload/v1564988402/WechatIMG5_tnqecw.jpg">
 <meta property="og:image" content="https://res.cloudinary.com/djyodckal/image/upload/v1564988405/WechatIMG7_njq2st.jpg">
@@ -38,7 +38,7 @@
 <meta property="og:image" content="https://res.cloudinary.com/djyodckal/image/upload/v1564988412/WechatIMG17_cyaqh3.jpg">
 <meta property="og:image" content="https://res.cloudinary.com/djyodckal/image/upload/v1564988414/WechatIMG20_g6a2ov.jpg">
 <meta property="article:published_time" content="2019-08-04T16:00:00.000Z">
-<meta property="article:modified_time" content="2021-06-10T08:22:00.487Z">
+<meta property="article:modified_time" content="2021-06-11T12:56:23.887Z">
 <meta property="article:author" content="Woodwind">
 <meta property="article:tag" content="实习">
 <meta property="article:tag" content="计算机网络">
@@ -230,7 +230,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-06-10 16:22:00" itemprop="dateModified" datetime="2021-06-10T16:22:00+08:00">2021-06-10</time>
+                <time title="修改时间：2021-06-11 20:56:23" itemprop="dateModified" datetime="2021-06-11T20:56:23+08:00">2021-06-11</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -271,6 +271,7 @@
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
               <span>3 分钟</span>
             </span>
+            <div class="post-description">计算机网络TCP和UDP应用。</div>
 
         </div>
       </header>
@@ -299,7 +300,7 @@
 </ol>
 <p> <em>这里用iperf2和iperf3互联一定要打开jperf2中“Enable Compatibility Mode”，因为两个版本不同。</em><br><img src="https://res.cloudinary.com/djyodckal/image/upload/v1564988412/WechatIMG17_cyaqh3.jpg"><br>最后附上一张测试带宽的图，配上输出的文本，用python算出了最大带宽。<br><img src="https://res.cloudinary.com/djyodckal/image/upload/v1564988414/WechatIMG20_g6a2ov.jpg"><br>实现代码如下：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os      <span class="comment"># List of  module  import  statements</span></span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line">DataPath = os.path.expanduser(<span class="string">&#x27;/Volumes/CENA_X64FRE&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">findMaxBandwidth</span>(<span class="params">name</span>):</span></span><br><span class="line">filename1 = DataPath + name</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(filename1) <span class="keyword">as</span> f:</span><br><span class="line">lines1 = f.read().splitlines()</span><br><span class="line">patternIP = <span class="string">&quot;[0-9]()&#123;1,3&#125;[.]()[0-9]()&#123;1,3&#125;[.]()[0-9]()&#123;1,3&#125;[.]()[0-9]()&#123;1,3&#125;&quot;</span></span><br><span class="line">IPs = re.findall(patternIP,lines1[<span class="number">5</span>]()+lines1[<span class="number">6</span>]())</span><br><span class="line">patternBandWidth = <span class="string">&quot;[0-9]()+[ \t]()Kbits/sec&quot;</span></span><br><span class="line">i = <span class="number">0</span></span><br><span class="line">bandwidthList =[]()</span><br><span class="line"><span class="keyword">while</span> i \&lt; <span class="built_in">len</span>(lines1):</span><br><span class="line">bandwidth = re.findall(patternBandWidth,lines1[i]())</span><br><span class="line"><span class="keyword">if</span> bandwidth != []():</span><br><span class="line">bandwidthList.append(<span class="built_in">int</span>(bandwidth[<span class="number">0</span>]().split(<span class="string">&#x27; &#x27;</span>)[<span class="number">0</span>]()))</span><br><span class="line">i += <span class="number">1</span></span><br><span class="line">MaxBandwidth = <span class="built_in">max</span>(bandwidthList)</span><br><span class="line"><span class="keyword">return</span> (IPs,MaxBandwidth)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__  == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">answer = findMaxBandwidth(<span class="string">&quot;/TCP_WANtoLAN&quot;</span>)</span><br><span class="line">IPs = answer[<span class="number">0</span>]()</span><br><span class="line">MaxBandwidth = answer[<span class="number">1</span>]()</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;TCP: &quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Local IP: &quot;</span> + IPs[<span class="number">0</span>]() + <span class="string">&quot; destinated IP: &quot;</span> + IPs[<span class="number">1</span>]())</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;bandwidth: &quot;</span> + <span class="built_in">str</span>(<span class="built_in">round</span>(<span class="built_in">int</span>(MaxBandwidth)/<span class="number">1024.0</span>,<span class="number">2</span>))+ <span class="string">&#x27;M/s&#x27;</span>)</span><br><span class="line">answer2 = findMaxBandwidth(<span class="string">&quot;/UDP_WANtoLAN&quot;</span>)</span><br><span class="line">IPs2 = answer2[<span class="number">0</span>]()</span><br><span class="line">MaxBandwidth2 = answer2[<span class="number">1</span>]()</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;UDP: &quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Local IP: &quot;</span> + IPs2[<span class="number">0</span>]() + <span class="string">&quot; destinated IP: &quot;</span> + IPs2[<span class="number">1</span>]())</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;bandwidth: &quot;</span> + <span class="built_in">str</span>(<span class="built_in">round</span>(<span class="built_in">int</span>(MaxBandwidth2)/<span class="number">1024.0</span>,<span class="number">2</span>))+<span class="string">&#x27;M/s&#x27;</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>`至此网络协议相关就结束了</p>
+<p>至此网络协议相关就结束了</p>
 
     </div>
 
@@ -400,20 +401,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-count">18</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-count">12</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-count">27</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -462,7 +463,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">57k</span>
+    <span title="站点总字数">58k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>

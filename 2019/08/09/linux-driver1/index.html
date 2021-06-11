@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="驱动介绍定义个人认为驱动就是在底层对于该设备的一些接口进行自己的定义，然后封装成一个个模块，然后让用户在应用层进行自我调用。以下是比较正统的定义。  驱动程序在 Linux 内核里扮演着特殊的角色。 它们是截然不同的”黑盒子”， 使硬件的特殊的一部分响应定义好的内部编程接口。 它们完全隐藏了设备工作的细节. 用户的活动通过一套标准化的调用来进行， 这些调用与特别的驱动是独立的； 设备驱动的角色就是">
+  <meta name="description" content="驱动介绍1">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Linux内核驱动介绍(1)">
 <meta property="og:url" content="http://example.com/2019/08/09/linux-driver1/index.html">
 <meta property="og:site_name" content="Woodwind">
-<meta property="og:description" content="驱动介绍定义个人认为驱动就是在底层对于该设备的一些接口进行自己的定义，然后封装成一个个模块，然后让用户在应用层进行自我调用。以下是比较正统的定义。  驱动程序在 Linux 内核里扮演着特殊的角色。 它们是截然不同的”黑盒子”， 使硬件的特殊的一部分响应定义好的内部编程接口。 它们完全隐藏了设备工作的细节. 用户的活动通过一套标准化的调用来进行， 这些调用与特别的驱动是独立的； 设备驱动的角色就是">
+<meta property="og:description" content="驱动介绍1">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2019-08-09T01:46:19.000Z">
-<meta property="article:modified_time" content="2021-06-10T08:21:37.476Z">
+<meta property="article:modified_time" content="2021-06-11T12:48:16.085Z">
 <meta property="article:author" content="Woodwind">
 <meta property="article:tag" content="Driver">
 <meta property="article:tag" content="Linux">
@@ -218,7 +218,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-06-10 16:21:37" itemprop="dateModified" datetime="2021-06-10T16:21:37+08:00">2021-06-10</time>
+                <time title="修改时间：2021-06-11 20:48:16" itemprop="dateModified" datetime="2021-06-11T20:48:16+08:00">2021-06-11</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -259,6 +259,7 @@
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
               <span>1 分钟</span>
             </span>
+            <div class="post-description">驱动介绍1</div>
 
         </div>
       </header>
@@ -288,10 +289,13 @@
 <li>重要数据结构</li>
 <li>设备操作<h2 id="主次设备号"><a href="#主次设备号" class="headerlink" title="主次设备号"></a>主次设备号</h2>主次设备号组成一个设备的设备号。主在前，次在后。<br>分配住主备号有两种：</li>
 <li>静态申请</li>
-<li>动态申请<h3 id="静态申请"><a href="#静态申请" class="headerlink" title="静态申请"></a>静态申请</h3>一般用 cat /proc/devices 确定一个设备号有没有被使用，然后用register_chrdev_region 函数进行注册设备号。<h4 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h4>如果不每次查找是否有该设备，会容易发生设备号冲突，导致驱动程序无法注册。每次查找又很麻烦。<h4 id="具体函数及操作"><a href="#具体函数及操作" class="headerlink" title="具体函数及操作"></a>具体函数及操作</h4><h5 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">`<span class="function"><span class="keyword">int</span> <span class="title">register_chrdev_region</span><span class="params">(<span class="keyword">dev_t</span> from,<span class="keyword">unsigned</span> count,<span class="keyword">const</span> <span class="keyword">char</span> *name)</span></span></span><br></pre></td></tr></table></figure>
-`<h5 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h5>from：为主设备号与次设备号的组合<br>count：为要注册的设备号的数量<br>name： 设备名字（具体体现在proc/devices 中显示的名字）<h3 id="动态申请"><a href="#动态申请" class="headerlink" title="动态申请"></a>动态申请</h3>用alloc_chrdev_region分配设备号，不需要查表。但是设备号得在安装完驱动后才能获取，因为安装前没有分配主设备号。<h4 id="具体函数及操作-1"><a href="#具体函数及操作-1" class="headerlink" title="具体函数及操作"></a>具体函数及操作</h4><h5 id="功能-1"><a href="#功能-1" class="headerlink" title="功能"></a>功能</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">alloc_chrdev_region</span><span class="params">(<span class="keyword">dev_t</span> *dev,<span class="keyword">unsigned</span> baseminor,<span class="keyword">unsigned</span> count,<span class="keyword">const</span> <span class="keyword">char</span> *name)</span></span></span><br></pre></td></tr></table></figure>
-`<h5 id="参数-1"><a href="#参数-1" class="headerlink" title="参数"></a>参数</h5>dev： 分配到的设备号<br> baseminor： 起始次设备号<br> count： 要注册的设备号个数<br> name： 设备名</li>
+<li>动态申请<h3 id="静态申请"><a href="#静态申请" class="headerlink" title="静态申请"></a>静态申请</h3>一般用 cat /proc/devices 确定一个设备号有没有被使用，然后用register_chrdev_region 函数进行注册设备号。<h4 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h4>如果不每次查找是否有该设备，会容易发生设备号冲突，导致驱动程序无法注册。每次查找又很麻烦。<h4 id="具体函数及操作"><a href="#具体函数及操作" class="headerlink" title="具体函数及操作"></a>具体函数及操作</h4><h5 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">register_chrdev_region</span><span class="params">(<span class="keyword">dev_t</span> from,<span class="keyword">unsigned</span> count,<span class="keyword">const</span> <span class="keyword">char</span> *name)</span></span></span><br></pre></td></tr></table></figure></li>
 </ul>
+<h5 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h5><p>from：为主设备号与次设备号的组合<br>count：为要注册的设备号的数量<br>name： 设备名字（具体体现在proc/devices 中显示的名字）</p>
+<h3 id="动态申请"><a href="#动态申请" class="headerlink" title="动态申请"></a>动态申请</h3><p>用alloc_chrdev_region分配设备号，不需要查表。但是设备号得在安装完驱动后才能获取，因为安装前没有分配主设备号。</p>
+<h4 id="具体函数及操作-1"><a href="#具体函数及操作-1" class="headerlink" title="具体函数及操作"></a>具体函数及操作</h4><h5 id="功能-1"><a href="#功能-1" class="headerlink" title="功能"></a>功能</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">alloc_chrdev_region</span><span class="params">(<span class="keyword">dev_t</span> *dev,<span class="keyword">unsigned</span> baseminor,<span class="keyword">unsigned</span> count,<span class="keyword">const</span> <span class="keyword">char</span> *name)</span></span></span><br></pre></td></tr></table></figure>
+
+<h5 id="参数-1"><a href="#参数-1" class="headerlink" title="参数"></a>参数</h5><p>dev： 分配到的设备号<br> baseminor： 起始次设备号<br> count： 要注册的设备号个数<br> name： 设备名</p>
 <p>篇幅有限，之后的见下一篇。</p>
 
     </div>
@@ -392,20 +396,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-count">18</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-count">12</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-count">27</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -454,7 +458,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">57k</span>
+    <span title="站点总字数">58k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
