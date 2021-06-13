@@ -4,11 +4,38 @@
   
     
     <entry>
+      <title>GPU功能及特性2</title>
+      <link href="/2021/06/13/gpu2/"/>
+      <url>/2021/06/13/gpu2/</url>
+      
+        <content type="html"><![CDATA[<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>这章节主要介绍GPU软件上的架构，具体参考NVIDIA官方手册。</p><h1 id="线程结构"><a href="#线程结构" class="headerlink" title="线程结构"></a>线程结构</h1><p>![线程结构][image-1]<br>如上图所示，GPU对线程的控制具体具体由Grid，block和thread三级进行分级。Grid是最高级的他直接控制block数量与空间上的排列。可以把grid看作是一个每个元素是block的三维矩阵。而block又是一个每个元素是thread的三维矩阵。（图中只是个（x,y,0）的二维矩阵）</p><p>线程是执行任务的最基础单元，通过三维矩阵的特点能让软件工程师更好的完成某些任务，<br>[image-1]:    <a href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/graphics/grid-of-thread-blocks.png">https://docs.nvidia.com/cuda/cuda-c-programming-guide/graphics/grid-of-thread-blocks.png</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> GPU </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> GPU </tag>
+            
+            <tag> 目录 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>GPU功能及特性1</title>
       <link href="/2021/06/11/gpu1/"/>
       <url>/2021/06/11/gpu1/</url>
       
-        <content type="html"><![CDATA[<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>这章节主要介绍GPU是什么，具有什么功能以及为什么选择GPU。</p><h1 id="GPU是什么"><a href="#GPU是什么" class="headerlink" title="GPU是什么"></a>GPU是什么</h1><p>GPU全称Graphics processing unit（图像处理单位）但是这系列主要介绍GPGPU就是general purpose GPU，就是做通用计算的GPU。（暂不涉及渲染的模型和理论）</p><h2 id="具体特点"><a href="#具体特点" class="headerlink" title="具体特点"></a>具体特点</h2><h3 id="1-高可编程性。"><a href="#1-高可编程性。" class="headerlink" title="1.高可编程性。"></a>1.高可编程性。</h3><p>cuda等进行编程。</p><h3 id="2-商品级硬件。"><a href="#2-商品级硬件。" class="headerlink" title="2.商品级硬件。"></a>2.商品级硬件。</h3><p>价格不算过于昂贵。</p><h3 id="3-数以百计的ALU（逻辑运算单元），数以万计的线程数。"><a href="#3-数以百计的ALU（逻辑运算单元），数以万计的线程数。" class="headerlink" title="3.数以百计的ALU（逻辑运算单元），数以万计的线程数。"></a>3.数以百计的ALU（逻辑运算单元），数以万计的线程数。</h3><p>意味着GPU可以并行处理非常多的线程，效率高。</p><h1 id="效率与可编程性"><a href="#效率与可编程性" class="headerlink" title="效率与可编程性"></a>效率与可编程性</h1><p><img src="https://res.cloudinary.com/db6zr5nzu/image/upload/v1623414334/%E5%8F%AF%E7%BC%96%E7%A8%8B%E6%80%A7vs%E7%A1%AC%E4%BB%B6%E6%95%88%E7%8E%87_m0mksy.png"><br>上图是一个各个设计的效率和可编程性的一个比较图。从可编程性的角度来说单核的CPU是最好编程的，因为他只有一个核心，不需要考虑多核对数据的原子操作（atomic operation），多核次之。GPU比多核较难编程一点，不仅仅因为GPU的核数是多核的几百上千倍，而且GPU为解决多核同时调用数据时，内存带宽对效率的影响，设计与CPU非常不同。ASIC设计是数字IC中为了某一个目标专门定制的硬件电路。因为硬件定制的电路需要先RTL设计，然后形式仿真测试逻辑，再静态时序分析解决诸如毛刺，延迟电路和时钟偏移等问题，再制造，最后ATGP测试制造中有没有defects，所以这个流程是很复杂的。当然制造CPU，GPU也需要经历以上的过程，但是我们可以根据现成的CPU和GPU完成任务，而不需要每次根据特定目标进行<strong>设计及制造</strong>达到定制电路。</p><p>接下来聊一下各个数据之间效率的对比。</p><p>效率主要考虑的问题在于实现功能需要的时间和在芯片上占用的面积上多方面考虑。因为CPU需要处理一些比较总体的任务，所以有处理不同功能的模块。同时协调不同的功能也需要额外的时间（如果指令集过大，检索之类的时候也会花费更多的时间，可能更重要的因素一下子想不到。）因为CPU需要的功能多，所以在芯片上占用的面积会比GPU和ASIC多。GPU其实是针对特定任务进行加速的架构。（例如渲染，计算加速，机器学习的卷积等能高并行的任务。）ASIC是针对摸一个特定的运用场景的，所以他只会包含能实现这个场景最少的模块和功能。功能模块的减少能有效的减少crtical path导致时间减少。具体见下图。<br><img src="https://res.cloudinary.com/db6zr5nzu/image/upload/v1623569765/CPUvsGPU_nysxuk.png"><br>（GPU的图只是大致图像，比例数量上可能有较大出入见谅）<br>相比较CPU，GPU有非常多的ALU单元，较少的cache。因为GPU的cache hit是较为困难的，而且可以考多线程减少cache miss带来的负影响。同时GPU把大量的alu连起来成为一个wrap（NVIDIA）或者wavefront（AMD），用一个control单元进行控制，可以省去不少control单元的面积。</p><h1 id="特点与总结"><a href="#特点与总结" class="headerlink" title="特点与总结"></a>特点与总结</h1><p>综上所述，GPU具有非常多的线程（threads），以及有一个控制一组线程的control单元。所以当需要很多线程处理同一类型的任务的时候，可以很好的发挥GPU的特点。</p>]]></content>
+        <content type="html"><![CDATA[<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>这章节主要介绍GPU是什么，具有什么功能以及为什么选择GPU。</p><h1 id="GPU是什么"><a href="#GPU是什么" class="headerlink" title="GPU是什么"></a>GPU是什么</h1><p>GPU全称Graphics processing unit（图像处理单位）但是这系列主要介绍GPGPU就是general purpose GPU，就是做通用计算的GPU。（暂不涉及渲染的模型和理论）</p><h2 id="具体特点"><a href="#具体特点" class="headerlink" title="具体特点"></a>具体特点</h2><h3 id="1-高可编程性。"><a href="#1-高可编程性。" class="headerlink" title="1.高可编程性。"></a>1.高可编程性。</h3><p>cuda等进行编程。</p><h3 id="2-商品级硬件。"><a href="#2-商品级硬件。" class="headerlink" title="2.商品级硬件。"></a>2.商品级硬件。</h3><p>价格不算过于昂贵。</p><h3 id="3-数以百计的ALU（逻辑运算单元），数以万计的线程数。"><a href="#3-数以百计的ALU（逻辑运算单元），数以万计的线程数。" class="headerlink" title="3.数以百计的ALU（逻辑运算单元），数以万计的线程数。"></a>3.数以百计的ALU（逻辑运算单元），数以万计的线程数。</h3><p>意味着GPU可以并行处理非常多的线程，效率高。</p><h1 id="效率与可编程性"><a href="#效率与可编程性" class="headerlink" title="效率与可编程性"></a>效率与可编程性</h1><p><img src="https://res.cloudinary.com/db6zr5nzu/image/upload/v1623414334/%E5%8F%AF%E7%BC%96%E7%A8%8B%E6%80%A7vs%E7%A1%AC%E4%BB%B6%E6%95%88%E7%8E%87_m0mksy.png" alt="效率与可编程性"><br>上图是一个各个设计的效率和可编程性的一个比较图。从可编程性的角度来说单核的CPU是最好编程的，因为他只有一个核心，不需要考虑多核对数据的原子操作（atomic operation），多核次之。GPU比多核较难编程一点，不仅仅因为GPU的核数是多核的几百上千倍，而且GPU为解决多核同时调用数据时，内存带宽对效率的影响，设计与CPU非常不同。ASIC设计是数字IC中为了某一个目标专门定制的硬件电路。因为硬件定制的电路需要先RTL设计，然后形式仿真测试逻辑，再静态时序分析解决诸如毛刺，延迟电路和时钟偏移等问题，再制造，最后ATGP测试制造中有没有defects，所以这个流程是很复杂的。当然制造CPU，GPU也需要经历以上的过程，但是我们可以根据现成的CPU和GPU完成任务，而不需要每次根据特定目标进行<strong>设计及制造</strong>达到定制电路。</p><p>接下来聊一下各个数据之间效率的对比。</p><p>效率主要考虑的问题在于实现功能需要的时间和在芯片上占用的面积上多方面考虑。因为CPU需要处理一些比较总体的任务，所以有处理不同功能的模块。同时协调不同的功能也需要额外的时间（如果指令集过大，检索之类的时候也会花费更多的时间，可能更重要的因素一下子想不到。）因为CPU需要的功能多，所以在芯片上占用的面积会比GPU和ASIC多。GPU其实是针对特定任务进行加速的架构。（例如渲染，计算加速，机器学习的卷积等能高并行的任务。）ASIC是针对摸一个特定的运用场景的，所以他只会包含能实现这个场景最少的模块和功能。功能模块的减少能有效的减少crtical path导致时间减少。具体见下图。<br><img src="https://docs.nvidia.com/cuda/cuda-c-programming-guide/graphics/gpu-devotes-more-transistors-to-data-processing.png" alt="官方图"><br>（GPU NVIDIA官方图）<br>相比较CPU，GPU有非常多的ALU单元，较少的cache。因为GPU的cache hit是较为困难的，而且可以考多线程减少cache miss带来的负影响。同时GPU把大量的alu连起来成为一个wrap（NVIDIA）或者wavefront（AMD），用一个control单元进行控制，可以省去不少control单元的面积。</p><h1 id="特点与总结"><a href="#特点与总结" class="headerlink" title="特点与总结"></a>特点与总结</h1><p>综上所述，GPU具有非常多的线程（threads），以及有一个控制一组线程的control单元。所以当需要很多线程处理同一类型的任务的时候，可以很好的发挥GPU的特点。</p>]]></content>
       
       
       <categories>
@@ -231,16 +258,16 @@
       
       <categories>
           
-          <category> linux\_driver </category>
+          <category> linux driver </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> driver </tag>
+            <tag> Driver </tag>
             
-            <tag> linux </tag>
+            <tag> Linux </tag>
             
         </tags>
       
@@ -258,7 +285,7 @@
       
       <categories>
           
-          <category> Linux_driver </category>
+          <category> Linux driver </category>
           
       </categories>
       
@@ -285,7 +312,7 @@
       
       <categories>
           
-          <category> Linux </category>
+          <category> Linux driver </category>
           
       </categories>
       
@@ -455,7 +482,7 @@
       
       <categories>
           
-          <category> python text </category>
+          <category> Python text </category>
           
       </categories>
       
