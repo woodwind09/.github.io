@@ -20,16 +20,17 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="这篇文章具体讲GPU与其他设计的区别和GPU的特点。">
+  <meta name="description" content="这章节主要介绍GPU是什么，具有什么功能以及为什么选择GPU。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="GPU功能及特性1">
 <meta property="og:url" content="http://example.com/2021/06/11/gpu1/index.html">
 <meta property="og:site_name" content="Woodwind">
-<meta property="og:description" content="这篇文章具体讲GPU与其他设计的区别和GPU的特点。">
+<meta property="og:description" content="这章节主要介绍GPU是什么，具有什么功能以及为什么选择GPU。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://res.cloudinary.com/db6zr5nzu/image/upload/v1623414334/%E5%8F%AF%E7%BC%96%E7%A8%8B%E6%80%A7vs%E7%A1%AC%E4%BB%B6%E6%95%88%E7%8E%87_m0mksy.png">
+<meta property="og:image" content="https://res.cloudinary.com/db6zr5nzu/image/upload/v1623569765/CPUvsGPU_nysxuk.png">
 <meta property="article:published_time" content="2021-06-11T12:01:55.000Z">
-<meta property="article:modified_time" content="2021-06-11T12:43:15.498Z">
+<meta property="article:modified_time" content="2021-06-13T07:59:18.011Z">
 <meta property="article:author" content="Woodwind">
 <meta property="article:tag" content="GPU">
 <meta property="article:tag" content="目录">
@@ -212,10 +213,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-06-11 20:01:55 / 修改时间：20:43:15" itemprop="dateCreated datePublished" datetime="2021-06-11T20:01:55+08:00">2021-06-11</time>
+              <time title="创建时间：2021-06-11 20:01:55" itemprop="dateCreated datePublished" datetime="2021-06-11T20:01:55+08:00">2021-06-11</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-06-13 15:59:18" itemprop="dateModified" datetime="2021-06-13T15:59:18+08:00">2021-06-13</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -246,7 +253,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>390</span>
+              <span>1.2k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -255,7 +262,7 @@
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
               <span>1 分钟</span>
             </span>
-            <div class="post-description">这篇文章具体讲GPU与其他设计的区别和GPU的特点。</div>
+            <div class="post-description">这章节主要介绍GPU是什么，具有什么功能以及为什么选择GPU。</div>
 
         </div>
       </header>
@@ -266,8 +273,15 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><h1 id="效率与可编程性"><a href="#效率与可编程性" class="headerlink" title="效率与可编程性"></a>效率与可编程性</h1><p><img src="https://res.cloudinary.com/db6zr5nzu/image/upload/v1623414334/%E5%8F%AF%E7%BC%96%E7%A8%8B%E6%80%A7vs%E7%A1%AC%E4%BB%B6%E6%95%88%E7%8E%87_m0mksy.png"><br>上图是一个各个设计的效率和可编程性的一个比较图。从可编程性的角度来说单核的CPU是最好编程的，因为他只有一个核心，不需要考虑多核对数据的原子操作（atomic operation），多核次之。GPU比多核较难编程一点，不仅仅因为GPU的核数是多核的几百上千倍，而且GPU为解决多核同时调用数据时，内存带宽对效率的影响，设计与CPU非常不同。ASIC设计是数字IC中为了某一个目标专门定制的硬件电路。因为硬件定制的电路需要先RTL设计，然后形式仿真测试逻辑，再静态时序分析解决诸如毛刺，延迟电路和时钟偏移等问题，再制造，最后ATGP测试制造中有没有defects，所以这个流程是很复杂的。当然制造CPU，GPU也需要经历以上的过程，但是我们可以根据现成的CPU和GPU完成任务，而不需要每次根据特定目标进行<strong>设计及制造</strong>达到定制电路。</p>
+        <h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>这章节主要介绍GPU是什么，具有什么功能以及为什么选择GPU。</p>
+<h1 id="GPU是什么"><a href="#GPU是什么" class="headerlink" title="GPU是什么"></a>GPU是什么</h1><p>GPU全称Graphics processing unit（图像处理单位）但是这系列主要介绍GPGPU就是general purpose GPU，就是做通用计算的GPU。（暂不涉及渲染的模型和理论）</p>
+<h2 id="具体特点"><a href="#具体特点" class="headerlink" title="具体特点"></a>具体特点</h2><h3 id="1-高可编程性。"><a href="#1-高可编程性。" class="headerlink" title="1.高可编程性。"></a>1.高可编程性。</h3><p>cuda等进行编程。</p>
+<h3 id="2-商品级硬件。"><a href="#2-商品级硬件。" class="headerlink" title="2.商品级硬件。"></a>2.商品级硬件。</h3><p>价格不算过于昂贵。</p>
+<h3 id="3-数以百计的ALU（逻辑运算单元），数以万计的线程数。"><a href="#3-数以百计的ALU（逻辑运算单元），数以万计的线程数。" class="headerlink" title="3.数以百计的ALU（逻辑运算单元），数以万计的线程数。"></a>3.数以百计的ALU（逻辑运算单元），数以万计的线程数。</h3><p>意味着GPU可以并行处理非常多的线程，效率高。</p>
+<h1 id="效率与可编程性"><a href="#效率与可编程性" class="headerlink" title="效率与可编程性"></a>效率与可编程性</h1><p><img src="https://res.cloudinary.com/db6zr5nzu/image/upload/v1623414334/%E5%8F%AF%E7%BC%96%E7%A8%8B%E6%80%A7vs%E7%A1%AC%E4%BB%B6%E6%95%88%E7%8E%87_m0mksy.png"><br>上图是一个各个设计的效率和可编程性的一个比较图。从可编程性的角度来说单核的CPU是最好编程的，因为他只有一个核心，不需要考虑多核对数据的原子操作（atomic operation），多核次之。GPU比多核较难编程一点，不仅仅因为GPU的核数是多核的几百上千倍，而且GPU为解决多核同时调用数据时，内存带宽对效率的影响，设计与CPU非常不同。ASIC设计是数字IC中为了某一个目标专门定制的硬件电路。因为硬件定制的电路需要先RTL设计，然后形式仿真测试逻辑，再静态时序分析解决诸如毛刺，延迟电路和时钟偏移等问题，再制造，最后ATGP测试制造中有没有defects，所以这个流程是很复杂的。当然制造CPU，GPU也需要经历以上的过程，但是我们可以根据现成的CPU和GPU完成任务，而不需要每次根据特定目标进行<strong>设计及制造</strong>达到定制电路。</p>
 <p>接下来聊一下各个数据之间效率的对比。</p>
+<p>效率主要考虑的问题在于实现功能需要的时间和在芯片上占用的面积上多方面考虑。因为CPU需要处理一些比较总体的任务，所以有处理不同功能的模块。同时协调不同的功能也需要额外的时间（如果指令集过大，检索之类的时候也会花费更多的时间，可能更重要的因素一下子想不到。）因为CPU需要的功能多，所以在芯片上占用的面积会比GPU和ASIC多。GPU其实是针对特定任务进行加速的架构。（例如渲染，计算加速，机器学习的卷积等能高并行的任务。）ASIC是针对摸一个特定的运用场景的，所以他只会包含能实现这个场景最少的模块和功能。功能模块的减少能有效的减少crtical path导致时间减少。具体见下图。<br><img src="https://res.cloudinary.com/db6zr5nzu/image/upload/v1623569765/CPUvsGPU_nysxuk.png"><br>（GPU的图只是大致图像，比例数量上可能有较大出入见谅）<br>相比较CPU，GPU有非常多的ALU单元，较少的cache。因为GPU的cache hit是较为困难的，而且可以考多线程减少cache miss带来的负影响。同时GPU把大量的alu连起来成为一个wrap（NVIDIA）或者wavefront（AMD），用一个control单元进行控制，可以省去不少control单元的面积。</p>
+<h1 id="特点与总结"><a href="#特点与总结" class="headerlink" title="特点与总结"></a>特点与总结</h1><p>综上所述，GPU具有非常多的线程（threads），以及有一个控制一组线程的control单元。所以当需要很多线程处理同一类型的任务的时候，可以很好的发挥GPU的特点。</p>
 
     </div>
 
@@ -350,7 +364,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%88%E7%8E%87%E4%B8%8E%E5%8F%AF%E7%BC%96%E7%A8%8B%E6%80%A7"><span class="nav-number">2.</span> <span class="nav-text">效率与可编程性</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GPU%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">2.</span> <span class="nav-text">GPU是什么</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E7%89%B9%E7%82%B9"><span class="nav-number">2.1.</span> <span class="nav-text">具体特点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E9%AB%98%E5%8F%AF%E7%BC%96%E7%A8%8B%E6%80%A7%E3%80%82"><span class="nav-number">2.1.1.</span> <span class="nav-text">1.高可编程性。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%95%86%E5%93%81%E7%BA%A7%E7%A1%AC%E4%BB%B6%E3%80%82"><span class="nav-number">2.1.2.</span> <span class="nav-text">2.商品级硬件。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%95%B0%E4%BB%A5%E7%99%BE%E8%AE%A1%E7%9A%84ALU%EF%BC%88%E9%80%BB%E8%BE%91%E8%BF%90%E7%AE%97%E5%8D%95%E5%85%83%EF%BC%89%EF%BC%8C%E6%95%B0%E4%BB%A5%E4%B8%87%E8%AE%A1%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%95%B0%E3%80%82"><span class="nav-number">2.1.3.</span> <span class="nav-text">3.数以百计的ALU（逻辑运算单元），数以万计的线程数。</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%88%E7%8E%87%E4%B8%8E%E5%8F%AF%E7%BC%96%E7%A8%8B%E6%80%A7"><span class="nav-number">3.</span> <span class="nav-text">效率与可编程性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%89%B9%E7%82%B9%E4%B8%8E%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">特点与总结</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -432,7 +446,7 @@
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">52 分钟</span>
+    <span title="站点阅读时长">53 分钟</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
   </div>
