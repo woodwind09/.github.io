@@ -8,7 +8,7 @@
       <link href="/2021/06/13/Gpu_index/"/>
       <url>/2021/06/13/Gpu_index/</url>
       
-        <content type="html"><![CDATA[<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>从这篇博文开始就开始整理与GPU相关的内容了。</p><h1 id="文章目录"><a href="#文章目录" class="headerlink" title="文章目录"></a>文章目录</h1><p>这一系列将按照如下顺序对GPU知识进行系统性的梳理。</p><h2 id="1-GPU功能及特性"><a href="#1-GPU功能及特性" class="headerlink" title="1.GPU功能及特性"></a>1.GPU功能及特性</h2><p>首先会简略的介绍GPU是什么，GPU具有什么样的特点和他的应用前景。</p><h2 id="2-cuda-GPU软件内容"><a href="#2-cuda-GPU软件内容" class="headerlink" title="2.cuda-GPU软件内容"></a>2.cuda-GPU软件内容</h2><p>这部分会从GPU软件语言cuda入手，对GPU的一些性能上的特点进行描述，如shared memory，band conflict 和 branch/memory divergence等。</p><h2 id="3-GPU-架构"><a href="#3-GPU-架构" class="headerlink" title="3.GPU 架构"></a>3.GPU 架构</h2><p>这一部分会根据先前了解的一些软件特性描述GPU硬件上的设计及特点。</p>]]></content>
+        <content type="html"><![CDATA[<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>从这篇博文开始就开始整理与GPU相关的内容了。</p><h1 id="文章目录"><a href="#文章目录" class="headerlink" title="文章目录"></a>文章目录<a href="https://zhanglinfeng09.com/2021/06/11/gpu1/"></a></h1><p>这一系列将按照如下顺序对GPU知识进行系统性的梳理。</p><h2 id="1-GPU功能及特性"><a href="#1-GPU功能及特性" class="headerlink" title="1.GPU功能及特性"></a>1.<a href="https://zhanglinfeng09.com/2021/06/11/gpu1/">GPU功能及特性</a></h2><p>首先会简略的介绍GPU是什么，GPU具有什么样的特点和他的应用前景。</p><h2 id="2-CUDA-GPU软件内容"><a href="#2-CUDA-GPU软件内容" class="headerlink" title="2.CUDA-GPU软件内容"></a>2.<a href="https://zhanglinfeng09.com/2021/06/13/gpu2/">CUDA-GPU软件内容</a></h2><p>这部分会从GPU软件语言cuda入手，对GPU的一些性能上的特点进行描述，如shared memory，band conflict 和 branch/memory divergence等。</p><h2 id="3-GPU-架构"><a href="#3-GPU-架构" class="headerlink" title="3.GPU 架构"></a>3.GPU 架构</h2><p>这一部分会根据先前了解的一些软件特性描述GPU硬件上的设计及特点。</p>]]></content>
       
       
       <categories>
@@ -35,7 +35,7 @@
       <link href="/2021/06/13/gpu2/"/>
       <url>/2021/06/13/gpu2/</url>
       
-        <content type="html"><![CDATA[<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>这章节主要介绍GPU软件上的架构，具体参考NVIDIA官方手册。</p><h1 id="线程结构"><a href="#线程结构" class="headerlink" title="线程结构"></a>线程结构</h1><p>![线程结构][image-1]<br>如上图所示，GPU对线程的控制具体具体由Grid，block和thread三级进行分级。Grid是最高级的他直接控制block数量与空间上的排列。可以把grid看作是一个每个元素是block的三维矩阵。而block又是一个每个元素是thread的三维矩阵。（图中只是个（x,y,0）的二维矩阵）</p><p>线程是执行任务的最基础单元，通过三维矩阵的特点能让软件工程师更好的完成某些任务，<br>[image-1]:    <a href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/graphics/grid-of-thread-blocks.png">https://docs.nvidia.com/cuda/cuda-c-programming-guide/graphics/grid-of-thread-blocks.png</a></p>]]></content>
+        <content type="html"><![CDATA[<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>这章节主要介绍GPU软件上的架构，具体参考NVIDIA官方手册。</p><h1 id="线程结构"><a href="#线程结构" class="headerlink" title="线程结构"></a>线程结构</h1><p><img src="https://docs.nvidia.com/cuda/cuda-c-programming-guide/graphics/grid-of-thread-blocks.png" alt="线程结构"><br>如上图所示，GPU对线程的控制具体具体由Grid，block和thread三级进行分级。Grid是最高级的他直接控制block数量与空间上的排列。可以把grid看作是一个每个元素是block的三维矩阵。而block又是一个每个元素是thread的三维矩阵。（图中只是个（x,y,0）的二维矩阵）</p><p>线程是执行任务的最基础单元，通过三维矩阵的特点能让软件工程师更好的完成某些任务.</p>]]></content>
       
       
       <categories>
