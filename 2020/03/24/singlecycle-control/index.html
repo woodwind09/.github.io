@@ -256,14 +256,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>15k</span>
+              <span>13k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>13 分钟</span>
+              <span>12 分钟</span>
             </span>
             <div class="post-description">基于mips的 singlecycle CPU设计及实现中控制单元。</div>
 
@@ -290,17 +290,561 @@
 <li>写入目标地址为rt。RegDst= rt<br>所以以上就是解码这个指令得到的所有的控制信号。所以如果要正确的处理所有的信号，需要理解所有信号的作用及自己构建的CPU的功能。</li>
 </ol>
 <p>以下的是这个CPU所有需要包括的指令。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">MIPS Instruction Set Architecture</span><br><span class="line"></span><br><span class="line">---------------------&lt;reserved registers&gt;------------------------</span><br><span class="line">$<span class="number">0</span>                   zero</span><br><span class="line">$<span class="number">1</span>                   assembler temporary</span><br><span class="line">$<span class="number">29</span>                  <span class="built_in">stack</span> pointer</span><br><span class="line">$<span class="number">31</span>                  <span class="keyword">return</span> address</span><br><span class="line">---------------------&lt;R-type Instructions&gt;-----------------------</span><br><span class="line">ADDU   $rd,$rs,$rt   R[rd] &lt;= R[rs] + R[rt] (unchecked overflow)</span><br><span class="line">ADD    $rd,$rs,$rt   R[rd] &lt;= R[rs] + R[rt]</span><br><span class="line">AND    $rd,$rs,$rt   R[rd] &lt;= R[rs] AND R[rt]</span><br><span class="line">JR     $rs           PC &lt;= R[rs]</span><br><span class="line">NOR    $rd,$rs,$rt   R[rd] &lt;= ~(R[rs] OR R[rt])</span><br><span class="line">OR     $rd,$rs,$rt   R[rd] &lt;= R[rs] OR R[rt]</span><br><span class="line">SLT    $rd,$rs,$rt   R[rd] &lt;= (R[rs] &lt; R[rt]) ? <span class="number">1</span> : <span class="number">0</span></span><br><span class="line">SLTU   $rd,$rs,$rt   R[rd] &lt;= (R[rs] &lt; R[rt]) ? <span class="number">1</span> : <span class="number">0</span></span><br><span class="line">SLLV   $rd,$rs,$rt   R[rd] &lt;= R[rt] &lt;&lt; [<span class="number">0</span>:<span class="number">4</span>] R[rs]</span><br><span class="line">SRLV   $rd,$rs,$rt   R[rd] &lt;= R[rt] &gt;&gt; [<span class="number">0</span>:<span class="number">4</span>] R[rs]</span><br><span class="line">SUBU   $rd,$rs,$rt   R[rd] &lt;= R[rs] - R[rt] (unchecked overflow)</span><br><span class="line">SUB    $rd,$rs,$rt   R[rd] &lt;= R[rs] - R[rt]</span><br><span class="line">XOR    $rd,$rs,$rt   R[rd] &lt;= R[rs] XOR R[rt]</span><br><span class="line">---------------------&lt;I-type Instructions&gt;-----------------------</span><br><span class="line">ADDIU  $rt,$rs,imm   R[rt] &lt;= R[rs] + SignExtImm (unchecked overflow)</span><br><span class="line">ADDI   $rt,$rs,imm   R[rt] &lt;= R[rs] + SignExtImm</span><br><span class="line">ANDI   $rt,$rs,imm   R[rt] &lt;= R[rs] &amp; ZeroExtImm</span><br><span class="line">BEQ    $rs,$rt,label PC &lt;= (R[rs] == R[rt]) ? npc+BranchAddr : npc</span><br><span class="line">BNE    $rs,$rt,label PC &lt;= (R[rs] != R[rt]) ? npc+BranchAddr : npc</span><br><span class="line">LUI    $rt,imm       R[rt] &lt;= &#123;imm,<span class="number">16b</span><span class="number">&#x27;0</span>&#125;</span><br><span class="line">LW     $rt,imm($rs)  R[rt] &lt;= M[R[rs] + SignExtImm]</span><br><span class="line">ORI    $rt,$rs,imm   R[rt] &lt;= R[rs] OR ZeroExtImm</span><br><span class="line">SLTI   $rt,$rs,imm   R[rt] &lt;= (R[rs] &lt; SignExtImm) ? <span class="number">1</span> : <span class="number">0</span></span><br><span class="line">SLTIU  $rt,$rs,imm   R[rt] &lt;= (R[rs] &lt; SignExtImm) ? <span class="number">1</span> : <span class="number">0</span></span><br><span class="line">SW     $rt,imm($rs)  M[R[rs] + SignExtImm] &lt;= R[rt]</span><br><span class="line">LL     $rt,imm($rs)  R[rt] &lt;= M[R[rs] + SignExtImm]; rmwstate &lt;= addr</span><br><span class="line">SC     $rt,imm($rs)  <span class="keyword">if</span> (rmw) M[R[rs] + SignExtImm] &lt;= R[rt], R[rt] &lt;= <span class="number">1</span> <span class="keyword">else</span> R[rt] &lt;= <span class="number">0</span></span><br><span class="line">XORI   $rt,$rs,imm   R[rt] &lt;= R[rs] XOR ZeroExtImm</span><br><span class="line">---------------------&lt;J-type Instructions&gt;-----------------------</span><br><span class="line">J      label         PC &lt;= JumpAddr</span><br><span class="line">JAL    label         R[<span class="number">31</span>] &lt;= npc; PC &lt;= JumpAddr</span><br><span class="line">---------------------&lt;Other Instructions&gt;------------------------</span><br><span class="line">HALT</span><br><span class="line">---------------------&lt;Pseudo Instructions&gt;-----------------------</span><br><span class="line">PUSH   $rs           $<span class="number">29</span> &lt;= $<span class="number">29</span> - <span class="number">4</span>; Mem[$<span class="number">29</span>+<span class="number">0</span>] &lt;= R[rs] (sub+sw)</span><br><span class="line">POP    $rt           R[rt] &lt;= Mem[$<span class="number">29</span>+<span class="number">0</span>]; $<span class="number">29</span> &lt;= $<span class="number">29</span> + <span class="number">4</span> (add+lw)</span><br><span class="line">NOP                  Nop</span><br><span class="line">-----------------------------------------------------------------</span><br><span class="line">-----------------------------------------------------------------</span><br><span class="line">org  Addr         Set the base address <span class="keyword">for</span> the code to follow </span><br><span class="line">chw  #            Assign value to half word memory</span><br><span class="line">cfw  #            Assign value to word of memory</span><br></pre></td></tr></table></figure>
+<pre><code class="c">MIPS Instruction Set Architecture
+
+---------------------&lt;reserved registers&gt;------------------------
+$0                   zero
+$1                   assembler temporary
+$29                  stack pointer
+$31                  return address
+---------------------&lt;R-type Instructions&gt;-----------------------
+ADDU   $rd,$rs,$rt   R[rd] &lt;= R[rs] + R[rt] (unchecked overflow)
+ADD    $rd,$rs,$rt   R[rd] &lt;= R[rs] + R[rt]
+AND    $rd,$rs,$rt   R[rd] &lt;= R[rs] AND R[rt]
+JR     $rs           PC &lt;= R[rs]
+NOR    $rd,$rs,$rt   R[rd] &lt;= ~(R[rs] OR R[rt])
+OR     $rd,$rs,$rt   R[rd] &lt;= R[rs] OR R[rt]
+SLT    $rd,$rs,$rt   R[rd] &lt;= (R[rs] &lt; R[rt]) ? 1 : 0
+SLTU   $rd,$rs,$rt   R[rd] &lt;= (R[rs] &lt; R[rt]) ? 1 : 0
+SLLV   $rd,$rs,$rt   R[rd] &lt;= R[rt] &lt;&lt; [0:4] R[rs]
+SRLV   $rd,$rs,$rt   R[rd] &lt;= R[rt] &gt;&gt; [0:4] R[rs]
+SUBU   $rd,$rs,$rt   R[rd] &lt;= R[rs] - R[rt] (unchecked overflow)
+SUB    $rd,$rs,$rt   R[rd] &lt;= R[rs] - R[rt]
+XOR    $rd,$rs,$rt   R[rd] &lt;= R[rs] XOR R[rt]
+---------------------&lt;I-type Instructions&gt;-----------------------
+ADDIU  $rt,$rs,imm   R[rt] &lt;= R[rs] + SignExtImm (unchecked overflow)
+ADDI   $rt,$rs,imm   R[rt] &lt;= R[rs] + SignExtImm
+ANDI   $rt,$rs,imm   R[rt] &lt;= R[rs] &amp; ZeroExtImm
+BEQ    $rs,$rt,label PC &lt;= (R[rs] == R[rt]) ? npc+BranchAddr : npc
+BNE    $rs,$rt,label PC &lt;= (R[rs] != R[rt]) ? npc+BranchAddr : npc
+LUI    $rt,imm       R[rt] &lt;= &#123;imm,16b&#39;0&#125;
+LW     $rt,imm($rs)  R[rt] &lt;= M[R[rs] + SignExtImm]
+ORI    $rt,$rs,imm   R[rt] &lt;= R[rs] OR ZeroExtImm
+SLTI   $rt,$rs,imm   R[rt] &lt;= (R[rs] &lt; SignExtImm) ? 1 : 0
+SLTIU  $rt,$rs,imm   R[rt] &lt;= (R[rs] &lt; SignExtImm) ? 1 : 0
+SW     $rt,imm($rs)  M[R[rs] + SignExtImm] &lt;= R[rt]
+LL     $rt,imm($rs)  R[rt] &lt;= M[R[rs] + SignExtImm]; rmwstate &lt;= addr
+SC     $rt,imm($rs)  if (rmw) M[R[rs] + SignExtImm] &lt;= R[rt], R[rt] &lt;= 1 else R[rt] &lt;= 0
+XORI   $rt,$rs,imm   R[rt] &lt;= R[rs] XOR ZeroExtImm
+---------------------&lt;J-type Instructions&gt;-----------------------
+J      label         PC &lt;= JumpAddr
+JAL    label         R[31] &lt;= npc; PC &lt;= JumpAddr
+---------------------&lt;Other Instructions&gt;------------------------
+HALT
+---------------------&lt;Pseudo Instructions&gt;-----------------------
+PUSH   $rs           $29 &lt;= $29 - 4; Mem[$29+0] &lt;= R[rs] (sub+sw)
+POP    $rt           R[rt] &lt;= Mem[$29+0]; $29 &lt;= $29 + 4 (add+lw)
+NOP                  Nop
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+org  Addr         Set the base address for the code to follow 
+chw  #            Assign value to half word memory
+cfw  #            Assign value to word of memory
+</code></pre>
 <p>所以根据以上的指令集进行了归类，主要注意的是ALUsrc需要哪些input，做出了以下的表格进行整理。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">	|    Var    |    00     |    01     |    10     |    11    |</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">	|  ALUSrc   |    rs     |  unsign   |    sll    |   sign   |</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">	|  RegDst   |    rt     |    rd     |    31     |   zero   |</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">	|  PCSrc    |    no     |  Branch   |    JR     |  J/JAL   |</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">	|  DAtaSrc  |  portout  | dmemload  |    lui    |   PC+4   |</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<pre><code class="c">/*
+    |    Var    |    00     |    01     |    10     |    11    |
+
+    |  ALUSrc   |    rs     |  unsign   |    sll    |   sign   |
+
+    |  RegDst   |    rt     |    rd     |    31     |   zero   |
+
+    |  PCSrc    |    no     |  Branch   |    JR     |  J/JAL   |
+
+    |  DAtaSrc  |  portout  | dmemload  |    lui    |   PC+4   |
+*/
+</code></pre>
 <p>`所以看了一下，数据线B总共有datab，没符号立即数，有符号立即数以及SLL这种只取寄存器其中的五位。<br>JAL这个指令需要跳转，同时把跳转回来的程序地址储存到31号寄存器中。</p>
-<h5 id="主代码control-unit-sv"><a href="#主代码control-unit-sv" class="headerlink" title="主代码control_unit.sv"></a>主代码control_unit.sv</h5><figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">`<span class="meta-keyword">include</span> &quot;cpu_types_pkg.vh&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">`<span class="meta-keyword">include</span> &quot;control_unit_if.vh&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">module</span> control_unit(</span><br><span class="line">	control_unit_if<span class="variable">.ctr</span> cuif</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">	|    Var    |    00     |    01     |    10     |    11    |</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">	|  ALUSrc   |    rs     |  unsign   |    slt    |   sign   |</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">	|  RegDst   |    rt     |    rd     |    31     |   zero   |</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">	|  PCSrc    |    no     |  Branch   |    JR     |  J/JAL   |</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">	|  DAtaSrc  |  portout  | dmemload  |    lui    |   PC+4   |</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> cpu_types_pkg::*;</span><br><span class="line"><span class="keyword">logic</span> equFlag;</span><br><span class="line"><span class="keyword">always_comb</span> <span class="keyword">begin</span></span><br><span class="line">	equFlag = <span class="number">0</span>;<span class="comment">//beq bne flag</span></span><br><span class="line"></span><br><span class="line">	cuif<span class="variable">.PCSrc</span> = <span class="number">0</span>;<span class="comment">//pc mux</span></span><br><span class="line">	cuif<span class="variable">.DataSrc</span> = <span class="number">0</span>;<span class="comment">//memory to register mux</span></span><br><span class="line">	cuif<span class="variable">.ALUSrc</span> = <span class="number">0</span>;<span class="comment">//data bus 2 mux</span></span><br><span class="line">	cuif<span class="variable">.RegDest</span> = <span class="number">0</span>;<span class="comment">//destination register mux</span></span><br><span class="line">	</span><br><span class="line">	cuif<span class="variable">.memREN</span> = <span class="number">0</span>;</span><br><span class="line">	cuif<span class="variable">.memWEN</span> = <span class="number">0</span>;</span><br><span class="line">	cuif<span class="variable">.RegWEN</span> = <span class="number">0</span>;</span><br><span class="line">	cuif<span class="variable">.halt</span> = <span class="number">0</span>;</span><br><span class="line">	cuif<span class="variable">.branch</span> = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	cuif<span class="variable">.ALUOP</span> = ALU_ADD;</span><br><span class="line">	<span class="keyword">case</span>(cuif<span class="variable">.opcode</span>)</span><br><span class="line">		RTYPE: <span class="keyword">begin</span></span><br><span class="line">			<span class="keyword">case</span>(cuif<span class="variable">.funct</span>)</span><br><span class="line">				SLLV: <span class="keyword">begin</span></span><br><span class="line">					cuif<span class="variable">.ALUOP</span> = ALU_SLL;</span><br><span class="line">					cuif<span class="variable">.RegWEN</span> = <span class="number">1</span>;</span><br><span class="line">					cuif<span class="variable">.RegDest</span> = <span class="number">1</span>;</span><br><span class="line">					cuif<span class="variable">.ALUSrc</span> = <span class="number">2&#x27;b10</span>;</span><br><span class="line">				<span class="keyword">end</span></span><br><span class="line">				SRLV: <span class="keyword">begin</span></span><br><span class="line">					cuif<span class="variable">.ALUOP</span> = ALU_SRL;</span><br><span class="line">					cuif<span class="variable">.RegWEN</span> = <span class="number">1</span>;</span><br><span class="line">					cuif<span class="variable">.RegDest</span> = <span class="number">1</span>;</span><br><span class="line">					cuif<span class="variable">.ALUSrc</span> = <span class="number">2&#x27;b10</span>;</span><br><span class="line">				<span class="keyword">end</span></span><br><span class="line">				JR:  <span class="keyword">begin</span></span><br><span class="line">					cuif<span class="variable">.PCSrc</span> = <span class="number">2&#x27;b10</span>;</span><br><span class="line">				<span class="keyword">end</span></span><br><span class="line">				ADD: <span class="keyword">begin</span></span><br><span class="line">					cuif<span class="variable">.ALUOP</span> = ALU_ADD;</span><br><span class="line">					cuif<span class="variable">.RegWEN</span> = <span class="number">1</span>;</span><br><span class="line">					cuif<span class="variable">.RegDest</span> = <span class="number">1</span>;</span><br><span class="line">				<span class="keyword">end</span></span><br><span class="line">				ADDU: <span class="keyword">begin</span></span><br><span class="line">					cuif<span class="variable">.ALUOP</span> = ALU_ADD;</span><br><span class="line">					cuif<span class="variable">.RegWEN</span> = <span class="number">1</span>;</span><br><span class="line">					cuif<span class="variable">.RegDest</span> = <span class="number">1</span>;</span><br><span class="line">				<span class="keyword">end</span></span><br><span class="line">				SUB: <span class="keyword">begin</span></span><br><span class="line">					cuif<span class="variable">.ALUOP</span> = ALU_SUB;</span><br><span class="line">					cuif<span class="variable">.RegWEN</span> = <span class="number">1</span>;</span><br><span class="line">					cuif<span class="variable">.RegDest</span> = <span class="number">1</span>;</span><br><span class="line">				<span class="keyword">end</span></span><br><span class="line">				SUBU: <span class="keyword">begin</span></span><br><span class="line">					cuif<span class="variable">.ALUOP</span> = ALU_SUB;</span><br><span class="line">					cuif<span class="variable">.RegWEN</span> = <span class="number">1</span>;</span><br><span class="line">					cuif<span class="variable">.RegDest</span> = <span class="number">1</span>;</span><br><span class="line">				<span class="keyword">end</span></span><br><span class="line">				AND: <span class="keyword">begin</span></span><br><span class="line">					cuif<span class="variable">.ALUOP</span> = ALU_AND;</span><br><span class="line">					cuif<span class="variable">.RegWEN</span> = <span class="number">1</span>;</span><br><span class="line">					cuif<span class="variable">.RegDest</span> = <span class="number">1</span>;</span><br><span class="line">				<span class="keyword">end</span></span><br><span class="line">				OR: <span class="keyword">begin</span></span><br><span class="line">					cuif<span class="variable">.ALUOP</span> = ALU_OR;</span><br><span class="line">					cuif<span class="variable">.RegWEN</span> = <span class="number">1</span>;</span><br><span class="line">					cuif<span class="variable">.RegDest</span> = <span class="number">1</span>;</span><br><span class="line">				<span class="keyword">end</span></span><br><span class="line">				XOR: <span class="keyword">begin</span></span><br><span class="line">					cuif<span class="variable">.ALUOP</span> = ALU_XOR;</span><br><span class="line">					cuif<span class="variable">.RegWEN</span> = <span class="number">1</span>;</span><br><span class="line">					cuif<span class="variable">.RegDest</span> = <span class="number">1</span>;</span><br><span class="line">				<span class="keyword">end</span></span><br><span class="line">				NOR: <span class="keyword">begin</span></span><br><span class="line">					cuif<span class="variable">.ALUOP</span> = ALU_NOR;</span><br><span class="line">					cuif<span class="variable">.RegWEN</span> = <span class="number">1</span>;</span><br><span class="line">					cuif<span class="variable">.RegDest</span> = <span class="number">1</span>;</span><br><span class="line">				<span class="keyword">end</span></span><br><span class="line">				SLT: <span class="keyword">begin</span></span><br><span class="line">					cuif<span class="variable">.ALUOP</span> = ALU_SLT;</span><br><span class="line">					cuif<span class="variable">.RegWEN</span> = <span class="number">1</span>;</span><br><span class="line">					cuif<span class="variable">.RegDest</span> = <span class="number">1</span>;</span><br><span class="line">				<span class="keyword">end</span></span><br><span class="line">				SLTU: <span class="keyword">begin</span></span><br><span class="line">					cuif<span class="variable">.ALUOP</span> = ALU_SLTU;</span><br><span class="line">					cuif<span class="variable">.RegWEN</span> = <span class="number">1</span>;</span><br><span class="line">					cuif<span class="variable">.RegDest</span> = <span class="number">1</span>;</span><br><span class="line">				<span class="keyword">end</span></span><br><span class="line">		<span class="keyword">endcase</span></span><br><span class="line">		<span class="keyword">end</span></span><br><span class="line">	<span class="comment">//j type	</span></span><br><span class="line">	J: <span class="keyword">begin</span></span><br><span class="line">		cuif<span class="variable">.PCSrc</span> = <span class="number">2&#x27;b11</span>;</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	JAL: <span class="keyword">begin</span></span><br><span class="line">		cuif<span class="variable">.PCSrc</span> = <span class="number">2&#x27;b11</span>;</span><br><span class="line">		cuif<span class="variable">.RegDest</span> = <span class="number">2&#x27;b10</span>;</span><br><span class="line">		cuif<span class="variable">.RegWEN</span> = <span class="number">1</span>;	</span><br><span class="line">		cuif<span class="variable">.DataSrc</span> = <span class="number">2&#x27;b11</span>;</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">//itype</span></span><br><span class="line">	BEQ: <span class="keyword">begin</span></span><br><span class="line">		equFlag = <span class="number">1</span>;</span><br><span class="line">		cuif<span class="variable">.ALUOP</span> = ALU_SUB;</span><br><span class="line">		cuif<span class="variable">.PCSrc</span> = <span class="number">1</span>;</span><br><span class="line">		cuif<span class="variable">.branch</span>=cuif<span class="variable">.zerFlag</span> &amp; equFlag;</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	BNE: <span class="keyword">begin</span></span><br><span class="line">		equFlag = <span class="number">1</span>;</span><br><span class="line">		cuif<span class="variable">.ALUOP</span> = ALU_SUB;</span><br><span class="line">		cuif<span class="variable">.PCSrc</span> = <span class="number">1</span>;</span><br><span class="line">		cuif<span class="variable">.branch</span>=cuif<span class="variable">.zerFlag</span> ^ equFlag;</span><br><span class="line">	<span class="keyword">end</span>		</span><br><span class="line">	ADDI: <span class="keyword">begin</span></span><br><span class="line">		cuif<span class="variable">.RegWEN</span>=<span class="number">1&#x27;b1</span>;</span><br><span class="line">		cuif<span class="variable">.ALUSrc</span>=<span class="number">2&#x27;b11</span>;</span><br><span class="line">		cuif<span class="variable">.ALUOP</span>=ALU_ADD;	</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	ADDIU: <span class="keyword">begin</span></span><br><span class="line">		cuif<span class="variable">.RegWEN</span>=<span class="number">1&#x27;b1</span>;</span><br><span class="line">		cuif<span class="variable">.ALUSrc</span>=<span class="number">2&#x27;b11</span>;</span><br><span class="line">		cuif<span class="variable">.ALUOP</span>=ALU_ADD;	</span><br><span class="line">	<span class="keyword">end</span>			</span><br><span class="line">	ORI: <span class="keyword">begin</span></span><br><span class="line">		cuif<span class="variable">.RegWEN</span>=<span class="number">1&#x27;b1</span>;</span><br><span class="line">		cuif<span class="variable">.ALUSrc</span>=<span class="number">2&#x27;b1</span>;</span><br><span class="line">		cuif<span class="variable">.ALUOP</span>=ALU_OR;	</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	XORI: <span class="keyword">begin</span></span><br><span class="line">	 	cuif<span class="variable">.RegWEN</span>=<span class="number">1&#x27;b1</span>;</span><br><span class="line">		cuif<span class="variable">.ALUSrc</span>=<span class="number">2&#x27;b1</span>;</span><br><span class="line">		cuif<span class="variable">.ALUOP</span>=ALU_XOR;	</span><br><span class="line">	<span class="keyword">end</span>	</span><br><span class="line">	LUI: <span class="keyword">begin</span></span><br><span class="line">		cuif<span class="variable">.RegWEN</span>=<span class="number">1&#x27;b1</span>;</span><br><span class="line">		cuif<span class="variable">.DataSrc</span>=<span class="number">2&#x27;b10</span>;</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	LW: <span class="keyword">begin</span></span><br><span class="line">		cuif<span class="variable">.ALUSrc</span>=<span class="number">2&#x27;b11</span>;</span><br><span class="line">		cuif<span class="variable">.memREN</span>=<span class="number">1&#x27;b1</span>;</span><br><span class="line">		cuif<span class="variable">.DataSrc</span>=<span class="number">2&#x27;b1</span>;</span><br><span class="line">		cuif<span class="variable">.ALUOP</span>=ALU_ADD;</span><br><span class="line">		cuif<span class="variable">.RegWEN</span>=<span class="number">1&#x27;b1</span>;</span><br><span class="line">	<span class="keyword">end</span>			</span><br><span class="line">	SLTI: <span class="keyword">begin</span></span><br><span class="line">		cuif<span class="variable">.RegWEN</span>=<span class="number">1&#x27;b1</span>;</span><br><span class="line">		cuif<span class="variable">.ALUSrc</span>=<span class="number">2&#x27;b1</span>;</span><br><span class="line">		cuif<span class="variable">.ALUOP</span>=ALU_SLT;	</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	SLTIU: <span class="keyword">begin</span></span><br><span class="line">		cuif<span class="variable">.RegWEN</span>=<span class="number">1&#x27;b1</span>;</span><br><span class="line">		cuif<span class="variable">.ALUSrc</span>=<span class="number">2&#x27;b1</span>;</span><br><span class="line">		cuif<span class="variable">.ALUOP</span>=ALU_SLTU;</span><br><span class="line">	<span class="keyword">end</span>		</span><br><span class="line">	ANDI: <span class="keyword">begin</span></span><br><span class="line">		cuif<span class="variable">.RegWEN</span>=<span class="number">1&#x27;b1</span>;</span><br><span class="line">		cuif<span class="variable">.ALUSrc</span>=<span class="number">2&#x27;b11</span>;</span><br><span class="line">		cuif<span class="variable">.ALUOP</span>=ALU_AND;	</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	SW: <span class="keyword">begin</span></span><br><span class="line">		cuif<span class="variable">.ALUSrc</span>=<span class="number">2&#x27;b11</span>;</span><br><span class="line">		cuif<span class="variable">.memWEN</span>=<span class="number">1&#x27;b1</span>;</span><br><span class="line">		cuif<span class="variable">.DataSrc</span>=<span class="number">2&#x27;b1</span>;</span><br><span class="line">		cuif<span class="variable">.ALUOP</span>=ALU_ADD;</span><br><span class="line">		cuif<span class="variable">.RegWEN</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line">	<span class="keyword">end</span>						</span><br><span class="line">	HALT: <span class="keyword">begin</span></span><br><span class="line">		cuif<span class="variable">.halt</span>=<span class="number">1&#x27;b1</span>;</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line"><span class="keyword">endcase</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="keyword">endmodule</span>			</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h5 id="主代码control-unit-sv"><a href="#主代码control-unit-sv" class="headerlink" title="主代码control_unit.sv"></a>主代码control_unit.sv</h5><pre><code class="verilog">`include &quot;cpu_types_pkg.vh&quot;
+
+
+`include &quot;control_unit_if.vh&quot;
+
+module control_unit(
+    control_unit_if.ctr cuif
+);
+
+/*
+    |    Var    |    00     |    01     |    10     |    11    |
+
+    |  ALUSrc   |    rs     |  unsign   |    slt    |   sign   |
+
+    |  RegDst   |    rt     |    rd     |    31     |   zero   |
+
+    |  PCSrc    |    no     |  Branch   |    JR     |  J/JAL   |
+
+    |  DAtaSrc  |  portout  | dmemload  |    lui    |   PC+4   |
+*/
+
+import cpu_types_pkg::*;
+logic equFlag;
+always_comb begin
+    equFlag = 0;//beq bne flag
+
+    cuif.PCSrc = 0;//pc mux
+    cuif.DataSrc = 0;//memory to register mux
+    cuif.ALUSrc = 0;//data bus 2 mux
+    cuif.RegDest = 0;//destination register mux
+    
+    cuif.memREN = 0;
+    cuif.memWEN = 0;
+    cuif.RegWEN = 0;
+    cuif.halt = 0;
+    cuif.branch = 0;
+
+    cuif.ALUOP = ALU_ADD;
+    case(cuif.opcode)
+        RTYPE: begin
+            case(cuif.funct)
+                SLLV: begin
+                    cuif.ALUOP = ALU_SLL;
+                    cuif.RegWEN = 1;
+                    cuif.RegDest = 1;
+                    cuif.ALUSrc = 2&#39;b10;
+                end
+                SRLV: begin
+                    cuif.ALUOP = ALU_SRL;
+                    cuif.RegWEN = 1;
+                    cuif.RegDest = 1;
+                    cuif.ALUSrc = 2&#39;b10;
+                end
+                JR:  begin
+                    cuif.PCSrc = 2&#39;b10;
+                end
+                ADD: begin
+                    cuif.ALUOP = ALU_ADD;
+                    cuif.RegWEN = 1;
+                    cuif.RegDest = 1;
+                end
+                ADDU: begin
+                    cuif.ALUOP = ALU_ADD;
+                    cuif.RegWEN = 1;
+                    cuif.RegDest = 1;
+                end
+                SUB: begin
+                    cuif.ALUOP = ALU_SUB;
+                    cuif.RegWEN = 1;
+                    cuif.RegDest = 1;
+                end
+                SUBU: begin
+                    cuif.ALUOP = ALU_SUB;
+                    cuif.RegWEN = 1;
+                    cuif.RegDest = 1;
+                end
+                AND: begin
+                    cuif.ALUOP = ALU_AND;
+                    cuif.RegWEN = 1;
+                    cuif.RegDest = 1;
+                end
+                OR: begin
+                    cuif.ALUOP = ALU_OR;
+                    cuif.RegWEN = 1;
+                    cuif.RegDest = 1;
+                end
+                XOR: begin
+                    cuif.ALUOP = ALU_XOR;
+                    cuif.RegWEN = 1;
+                    cuif.RegDest = 1;
+                end
+                NOR: begin
+                    cuif.ALUOP = ALU_NOR;
+                    cuif.RegWEN = 1;
+                    cuif.RegDest = 1;
+                end
+                SLT: begin
+                    cuif.ALUOP = ALU_SLT;
+                    cuif.RegWEN = 1;
+                    cuif.RegDest = 1;
+                end
+                SLTU: begin
+                    cuif.ALUOP = ALU_SLTU;
+                    cuif.RegWEN = 1;
+                    cuif.RegDest = 1;
+                end
+        endcase
+        end
+    //j type    
+    J: begin
+        cuif.PCSrc = 2&#39;b11;
+    end
+    JAL: begin
+        cuif.PCSrc = 2&#39;b11;
+        cuif.RegDest = 2&#39;b10;
+        cuif.RegWEN = 1;    
+        cuif.DataSrc = 2&#39;b11;
+    end
+
+    //itype
+    BEQ: begin
+        equFlag = 1;
+        cuif.ALUOP = ALU_SUB;
+        cuif.PCSrc = 1;
+        cuif.branch=cuif.zerFlag &amp; equFlag;
+    end
+    BNE: begin
+        equFlag = 1;
+        cuif.ALUOP = ALU_SUB;
+        cuif.PCSrc = 1;
+        cuif.branch=cuif.zerFlag ^ equFlag;
+    end        
+    ADDI: begin
+        cuif.RegWEN=1&#39;b1;
+        cuif.ALUSrc=2&#39;b11;
+        cuif.ALUOP=ALU_ADD;    
+    end
+    ADDIU: begin
+        cuif.RegWEN=1&#39;b1;
+        cuif.ALUSrc=2&#39;b11;
+        cuif.ALUOP=ALU_ADD;    
+    end            
+    ORI: begin
+        cuif.RegWEN=1&#39;b1;
+        cuif.ALUSrc=2&#39;b1;
+        cuif.ALUOP=ALU_OR;    
+    end
+    XORI: begin
+         cuif.RegWEN=1&#39;b1;
+        cuif.ALUSrc=2&#39;b1;
+        cuif.ALUOP=ALU_XOR;    
+    end    
+    LUI: begin
+        cuif.RegWEN=1&#39;b1;
+        cuif.DataSrc=2&#39;b10;
+    end
+    LW: begin
+        cuif.ALUSrc=2&#39;b11;
+        cuif.memREN=1&#39;b1;
+        cuif.DataSrc=2&#39;b1;
+        cuif.ALUOP=ALU_ADD;
+        cuif.RegWEN=1&#39;b1;
+    end            
+    SLTI: begin
+        cuif.RegWEN=1&#39;b1;
+        cuif.ALUSrc=2&#39;b1;
+        cuif.ALUOP=ALU_SLT;    
+    end
+    SLTIU: begin
+        cuif.RegWEN=1&#39;b1;
+        cuif.ALUSrc=2&#39;b1;
+        cuif.ALUOP=ALU_SLTU;
+    end        
+    ANDI: begin
+        cuif.RegWEN=1&#39;b1;
+        cuif.ALUSrc=2&#39;b11;
+        cuif.ALUOP=ALU_AND;    
+    
+    end
+    SW: begin
+        cuif.ALUSrc=2&#39;b11;
+        cuif.memWEN=1&#39;b1;
+        cuif.DataSrc=2&#39;b1;
+        cuif.ALUOP=ALU_ADD;
+        cuif.RegWEN=1&#39;b0;
+    end                        
+    HALT: begin
+        cuif.halt=1&#39;b1;
+    end
+endcase
+end
+endmodule            
+</code></pre>
 <p>`</p>
 <h5 id="接口代码control-unit-if-vh"><a href="#接口代码control-unit-if-vh" class="headerlink" title="接口代码control_unit_if.vh"></a>接口代码control_unit_if.vh</h5><p>这次输入输出信号非常的多，所以写了接口代码。</p>
-<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">`<span class="meta-keyword">ifndef</span> CONTROL_UNIT_IF_VH</span></span><br><span class="line"><span class="meta">`<span class="meta-keyword">define</span> CONTROL_UNIT_IF_VH</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// typedefs</span></span><br><span class="line"><span class="meta">`<span class="meta-keyword">include</span> &quot;cpu_types_pkg.vh&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">interface</span> control_unit_if;</span><br><span class="line">  <span class="comment">// import types</span></span><br><span class="line">  <span class="keyword">import</span> cpu_types_pkg::*;</span><br><span class="line">	</span><br><span class="line">	opcode_t opcode;</span><br><span class="line">	funct_t  funct;</span><br><span class="line">	<span class="keyword">logic</span> [<span class="number">1</span>:<span class="number">0</span>] PCSrc,DataSrc,ALUSrc,RegDest;</span><br><span class="line">	<span class="keyword">logic</span> memREN, memWEN, RegWEN, halt, zerFlag, branch, dhit, ihit;	</span><br><span class="line">	<span class="keyword">logic</span> [<span class="number">3</span>:<span class="number">0</span>] ALUOP;</span><br><span class="line"></span><br><span class="line"><span class="keyword">modport</span> ctr (</span><br><span class="line">	<span class="keyword">input</span> opcode, funct, zerFlag,dhit,ihit,</span><br><span class="line">	<span class="keyword">output</span> PCSrc,DataSrc,ALUSrc, memREN, memWEN, RegWEN, ALUOP, RegDest, halt, branch	</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">modport</span> tb (</span><br><span class="line">	<span class="keyword">input</span> PCSrc,DataSrc,ALUSrc, memREN, memWEN, RegWEN, ALUOP, RegDest, halt, branch,</span><br><span class="line">	<span class="keyword">output</span> opcode, funct, zerFlag, dhit</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">endinterface</span></span><br><span class="line"><span class="meta">`<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<pre><code class="verilog">
+`ifndef CONTROL_UNIT_IF_VH
+`define CONTROL_UNIT_IF_VH
 
+// typedefs
+`include &quot;cpu_types_pkg.vh&quot;
+
+interface control_unit_if;
+  // import types
+  import cpu_types_pkg::*;
+    
+    opcode_t opcode;
+    funct_t  funct;
+    logic [1:0] PCSrc,DataSrc,ALUSrc,RegDest;
+    logic memREN, memWEN, RegWEN, halt, zerFlag, branch, dhit, ihit;    
+    logic [3:0] ALUOP;
+
+modport ctr (
+    input opcode, funct, zerFlag,dhit,ihit,
+    output PCSrc,DataSrc,ALUSrc, memREN, memWEN, RegWEN, ALUOP, RegDest, halt, branch    
+);
+
+modport tb (
+    input PCSrc,DataSrc,ALUSrc, memREN, memWEN, RegWEN, ALUOP, RegDest, halt, branch,
+    output opcode, funct, zerFlag, dhit
+);
+
+endinterface
+`endif
+
+</code></pre>
 <h5 id="接口代码control-unit-tb-sv"><a href="#接口代码control-unit-tb-sv" class="headerlink" title="接口代码control_unit_tb.sv"></a>接口代码control_unit_tb.sv</h5><p>这次测试代码按照规范一个个写了assert来验证，但是很奇怪有些的assert就是对不上。</p>
-<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">`<span class="meta-keyword">include</span> &quot;control_unit_if.vh&quot;</span></span><br><span class="line"><span class="meta">`<span class="meta-keyword">include</span> &quot;cpu_types_pkg.vh&quot;</span></span><br><span class="line"><span class="meta">`<span class="meta-keyword">timescale</span> 1 ns / 1 ns</span></span><br><span class="line"><span class="keyword">import</span> cpu_types_pkg::*;</span><br><span class="line"><span class="keyword">module</span> control_unit_tb;</span><br><span class="line">  </span><br><span class="line">	<span class="keyword">parameter</span> PERIOD = <span class="number">10</span>;</span><br><span class="line">  </span><br><span class="line">	<span class="keyword">logic</span> CLK = <span class="number">0</span>, nRST;</span><br><span class="line">  </span><br><span class="line">	<span class="comment">// clock</span></span><br><span class="line">	<span class="keyword">always</span> <span class="variable">#(PERIOD/2)</span> CLK++;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//interface</span></span><br><span class="line">	control_unit_if cuif();</span><br><span class="line">	test21 prog(CLK,nRst,cuif); </span><br><span class="line">	<span class="comment">//test program</span></span><br><span class="line">	<span class="comment">//test PROG (CLK, nRST, cuif);</span></span><br><span class="line"><span class="meta">`<span class="meta-keyword">ifndef</span> MAPPED</span></span><br><span class="line">	control_unit DUT(cuif);</span><br><span class="line"><span class="meta">`<span class="meta-keyword">endif</span></span></span><br><span class="line"><span class="keyword">endmodule</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">program</span> test21 (<span class="keyword">input</span> <span class="keyword">logic</span> CLK, </span><br><span class="line">	      <span class="keyword">output</span> <span class="keyword">logic</span> nRST,</span><br><span class="line">	      control_unit_if<span class="variable">.tb</span> cuif);</span><br><span class="line"><span class="keyword">int</span> testcase =<span class="number">0</span>;</span><br><span class="line"><span class="keyword">initial</span> <span class="keyword">begin</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=RTYPE;</span><br><span class="line">	cuif<span class="variable">.funct</span>=SLLV;</span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line">    <span class="comment">//test reset</span></span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test J type</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=J;<span class="comment">//J</span></span><br><span class="line">	<span class="comment">//cuif.funct=SLLV;</span></span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;	</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> (cuif<span class="variable">.PCSrc</span> == <span class="number">2&#x27;b11</span>)<span class="keyword">else</span>  <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test JAL type	</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=JAL;<span class="comment">//JAL</span></span><br><span class="line">	<span class="comment">//cuif.funct=&#x27;0;</span></span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> (cuif<span class="variable">.PCSrc</span> == <span class="number">2&#x27;b11</span> &amp;&amp; cuif<span class="variable">.RegDest</span> == <span class="number">2&#x27;b10</span> &amp;&amp; cuif<span class="variable">.RegWEN</span> == <span class="number">1</span> &amp;&amp; cuif<span class="variable">.DataSrc</span> == <span class="number">2&#x27;b11</span>) <span class="keyword">else</span> <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test itype	</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=BEQ;<span class="comment">//BEQ</span></span><br><span class="line">	<span class="comment">//cuif.funct=&#x27;0;</span></span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> ( cuif<span class="variable">.PCSrc</span> == <span class="number">1</span> &amp;&amp; cuif<span class="variable">.branch</span> == <span class="number">0</span>) <span class="keyword">else</span> <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test itype	</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=BNE;<span class="comment">//BNE</span></span><br><span class="line">	<span class="comment">//cuif.funct=&#x27;0;</span></span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> ( cuif<span class="variable">.PCSrc</span> == <span class="number">1</span> &amp;&amp; cuif<span class="variable">.branch</span>==<span class="number">1</span>) <span class="keyword">else</span> <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test itype	</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=ADDI;<span class="comment">//ADDI</span></span><br><span class="line">	<span class="comment">//cuif.funct=&#x27;0;</span></span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> (cuif<span class="variable">.RegWEN</span>==<span class="number">1&#x27;b1</span> &amp;&amp; cuif<span class="variable">.ALUSrc</span>==<span class="number">2&#x27;b1</span>) <span class="keyword">else</span> <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test itype	</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=ANDI;<span class="comment">//ANDI</span></span><br><span class="line">	<span class="comment">//cuif.funct=&#x27;0;</span></span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> ( cuif<span class="variable">.RegWEN</span>==<span class="number">1&#x27;b1</span> &amp;&amp; cuif<span class="variable">.ALUSrc</span>==<span class="number">2&#x27;b11</span>) <span class="keyword">else</span> <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);</span><br><span class="line">    @(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test itype	</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=ORI;<span class="comment">//ORI</span></span><br><span class="line">	<span class="comment">//cuif.funct=&#x27;0;</span></span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> ( cuif<span class="variable">.RegWEN</span>==<span class="number">1&#x27;b1</span> &amp;&amp; cuif<span class="variable">.ALUSrc</span>==<span class="number">2&#x27;b11</span>)<span class="keyword">else</span> <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);</span><br><span class="line">    @(<span class="keyword">posedge</span> CLK)        </span><br><span class="line">	testcase++;<span class="comment">//test itype	</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=LUI;<span class="comment">//LUI</span></span><br><span class="line">	<span class="comment">//cuif.funct=&#x27;0;</span></span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> (cuif<span class="variable">.RegWEN</span>==<span class="number">1&#x27;b1</span> &amp;&amp; cuif<span class="variable">.DataSrc</span>==<span class="number">2&#x27;b10</span>) <span class="keyword">else</span> <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test itype	</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=HALT;<span class="comment">//HALT</span></span><br><span class="line">	<span class="comment">//cuif.funct=&#x27;0;</span></span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> (cuif<span class="variable">.halt</span>==<span class="number">1&#x27;b1</span>)  <span class="keyword">else</span> <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);	</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test Rtype	</span></span><br><span class="line">	cuif<span class="variable">.funct</span>=SLLV;<span class="comment">//SLL</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=RTYPE;</span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> ( cuif<span class="variable">.RegWEN</span> == <span class="number">1</span> &amp;&amp; cuif<span class="variable">.RegDest</span> == <span class="number">1</span> &amp;&amp; cuif<span class="variable">.ALUSrc</span> == <span class="number">2&#x27;b10</span>)<span class="keyword">else</span> <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);	</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test Rtype	</span></span><br><span class="line">	cuif<span class="variable">.funct</span>=SRLV;<span class="comment">//SLL</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=RTYPE;</span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> ( cuif<span class="variable">.RegWEN</span> ==<span class="number">1</span> &amp;&amp; cuif<span class="variable">.RegDest</span> == <span class="number">1</span>)<span class="keyword">else</span> <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);	</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test Rtype	</span></span><br><span class="line">	cuif<span class="variable">.funct</span>=ADD;<span class="comment">//SLL</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=RTYPE;</span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> ( cuif<span class="variable">.RegWEN</span> == <span class="number">1</span> &amp;&amp; cuif<span class="variable">.RegDest</span> == <span class="number">1</span> )<span class="keyword">else</span> <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);	</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test Rtype	</span></span><br><span class="line">	cuif<span class="variable">.funct</span>=ADDU;<span class="comment">//SLL</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=RTYPE;</span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> ( cuif<span class="variable">.RegWEN</span> == <span class="number">1</span> &amp;&amp; cuif<span class="variable">.RegDest</span> == <span class="number">1</span> )<span class="keyword">else</span> <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);	</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test Rtype	</span></span><br><span class="line">	cuif<span class="variable">.funct</span>=SUBU;<span class="comment">//SLL</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=RTYPE;</span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> ( cuif<span class="variable">.RegWEN</span> == <span class="number">1</span> )<span class="keyword">else</span> <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);	</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test Rtype	</span></span><br><span class="line">	cuif<span class="variable">.funct</span>=SUB;<span class="comment">//SLL</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=RTYPE;</span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line"></span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> ( cuif<span class="variable">.RegWEN</span> == <span class="number">1</span> )<span class="keyword">else</span> <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);	</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test Rtype	</span></span><br><span class="line">	cuif<span class="variable">.funct</span>=AND;<span class="comment">//SLL</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=RTYPE;</span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> ( cuif<span class="variable">.RegWEN</span> == <span class="number">1</span> )<span class="keyword">else</span> <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);	</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test Rtype	</span></span><br><span class="line">	cuif<span class="variable">.funct</span>=OR;<span class="comment">//SLL</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=RTYPE;</span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line"></span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> ( cuif<span class="variable">.RegWEN</span> == <span class="number">1</span> &amp;&amp; cuif<span class="variable">.RegDest</span> == <span class="number">1</span> )<span class="keyword">else</span> <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);	</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test Rtype	</span></span><br><span class="line">	cuif<span class="variable">.funct</span>=XOR;<span class="comment">//SLL</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=RTYPE;</span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line"></span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> ( cuif<span class="variable">.RegWEN</span> == <span class="number">1</span> &amp;&amp; cuif<span class="variable">.RegDest</span> == <span class="number">1</span> )  <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);	</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test Rtype	</span></span><br><span class="line">	cuif<span class="variable">.funct</span>=NOR;<span class="comment">//SLL</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=RTYPE;</span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line"></span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> ( cuif<span class="variable">.RegWEN</span> == <span class="number">1</span> &amp;&amp; cuif<span class="variable">.RegDest</span> == <span class="number">1</span> ) <span class="keyword">else</span> <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);	</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test Rtype	</span></span><br><span class="line">	cuif<span class="variable">.funct</span>=SLT;<span class="comment">//SLL</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=RTYPE;</span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line"></span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> ( cuif<span class="variable">.RegWEN</span> == <span class="number">1</span> &amp;&amp; cuif<span class="variable">.RegDest</span> == <span class="number">1</span> ) <span class="keyword">else</span> <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);	</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test Rtype	</span></span><br><span class="line">	cuif<span class="variable">.funct</span>=SLTU;<span class="comment">//SLL</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=RTYPE;</span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line"></span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">if</span> ( ~(cuif<span class="variable">.RegWEN</span> == <span class="number">1</span> &amp;&amp; cuif<span class="variable">.RegDest</span> == <span class="number">1</span> &amp;&amp; cuif<span class="variable">.ALUSrc</span> == <span class="number">2&#x27;b10</span>))  <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);	</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test Rtype	</span></span><br><span class="line">	cuif<span class="variable">.funct</span>=JR;<span class="comment">//JR</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=RTYPE;</span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> (cuif<span class="variable">.PCSrc</span> == <span class="number">2&#x27;b10</span>)   <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);	</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test Rtype	</span></span><br><span class="line">	cuif<span class="variable">.funct</span>=SUB;<span class="comment">//SUB</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=RTYPE;</span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> (cuif<span class="variable">.PCSrc</span> == <span class="number">2&#x27;b1</span> &amp;&amp; cuif<span class="variable">.RegWEN</span> == <span class="number">1</span> ) <span class="keyword">else</span> <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);	</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test Rtype	</span></span><br><span class="line">	cuif<span class="variable">.funct</span>=SUB;<span class="comment">//SUB</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=ADDIU;</span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> (cuif<span class="variable">.PCSrc</span> == <span class="number">2&#x27;b1</span>)  <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);	</span><br><span class="line"></span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test Rtype	</span></span><br><span class="line">	cuif<span class="variable">.funct</span>=SUB;<span class="comment">//SUB</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=SLTI;</span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> (cuif<span class="variable">.PCSrc</span> == <span class="number">2&#x27;b1</span>)  <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);	</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)	</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test Rtype	</span></span><br><span class="line">	cuif<span class="variable">.funct</span>=SUB;<span class="comment">//SUB</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=SLTIU;</span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> (cuif<span class="variable">.PCSrc</span> == <span class="number">2&#x27;b1</span>) <span class="keyword">else</span> <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);	</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)	</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test Rtype	</span></span><br><span class="line">	cuif<span class="variable">.funct</span>=SUB;<span class="comment">//SUB</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=XORI;</span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> (cuif<span class="variable">.ALUSrc</span> == <span class="number">2&#x27;b11</span>)  <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);	</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)	</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	testcase++;<span class="comment">//test Rtype	</span></span><br><span class="line">	cuif<span class="variable">.funct</span>=SUB;<span class="comment">//SUB</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=LW;</span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> (cuif<span class="variable">.ALUSrc</span> == <span class="number">2&#x27;b11</span> &amp;&amp;  cuif<span class="variable">.DataSrc</span> == <span class="number">1</span> )  <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);	</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">    testcase++;<span class="comment">//test Rtype	</span></span><br><span class="line">	cuif<span class="variable">.funct</span>=SUB;<span class="comment">//SUB</span></span><br><span class="line">	cuif<span class="variable">.opcode</span>=SW;</span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	<span class="keyword">assert</span> (cuif<span class="variable">.ALUSrc</span> == <span class="number">2&#x27;b11</span> &amp;&amp;  cuif<span class="variable">.DataSrc</span> == <span class="number">1</span>)  <span class="built_in">$display</span>(<span class="string">&quot;It&#x27;s gone wrong addtime %00g ns&quot;</span>,<span class="built_in">$time</span>);	</span><br><span class="line"></span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b1</span>;</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	cuif<span class="variable">.zerFlag</span>=<span class="number">1&#x27;b0</span>;	</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	cuif<span class="variable">.ihit</span>=<span class="number">1&#x27;b0</span>;	</span><br><span class="line">	cuif<span class="variable">.dhit</span>=<span class="number">1&#x27;b0</span>;	</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line">	cuif<span class="variable">.ihit</span>=<span class="number">1&#x27;b1</span>;	</span><br><span class="line">	cuif<span class="variable">.dhit</span>=<span class="number">1&#x27;b1</span>;</span><br><span class="line">	@(<span class="keyword">posedge</span> CLK)</span><br><span class="line"><span class="built_in">$finish</span>;			       </span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="keyword">endprogram</span></span><br></pre></td></tr></table></figure>
+<pre><code class="verilog">
+`include &quot;control_unit_if.vh&quot;
+`include &quot;cpu_types_pkg.vh&quot;
+`timescale 1 ns / 1 ns
+import cpu_types_pkg::*;
+module control_unit_tb;
+  
+    parameter PERIOD = 10;
+  
+    logic CLK = 0, nRST;
+  
+    // clock
+    always #(PERIOD/2) CLK++;
+
+    //interface
+    control_unit_if cuif();
+    test21 prog(CLK,nRst,cuif); 
+    //test program
+    //test PROG (CLK, nRST, cuif);
+`ifndef MAPPED
+    control_unit DUT(cuif);
+`endif
+endmodule
+
+program test21 (input logic CLK, 
+          output logic nRST,
+          control_unit_if.tb cuif);
+int testcase =0;
+initial begin
+    cuif.opcode=RTYPE;
+    cuif.funct=SLLV;
+    cuif.zerFlag=1&#39;b0;
+    //test reset
+    @(posedge CLK)
+    testcase++;//test J type
+    cuif.opcode=J;//J
+    //cuif.funct=SLLV;
+    cuif.zerFlag=1&#39;b0;    
+    @(posedge CLK)
+    assert (cuif.PCSrc == 2&#39;b11)else  $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);
+    @(posedge CLK)
+    testcase++;//test JAL type    
+    cuif.opcode=JAL;//JAL
+    //cuif.funct=&#39;0;
+    cuif.zerFlag=1&#39;b0;
+    @(posedge CLK)
+    assert (cuif.PCSrc == 2&#39;b11 &amp;&amp; cuif.RegDest == 2&#39;b10 &amp;&amp; cuif.RegWEN == 1 &amp;&amp; cuif.DataSrc == 2&#39;b11) else $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);
+    @(posedge CLK)
+    testcase++;//test itype    
+    cuif.opcode=BEQ;//BEQ
+    //cuif.funct=&#39;0;
+    cuif.zerFlag=1&#39;b0;
+    @(posedge CLK)
+    assert ( cuif.PCSrc == 1 &amp;&amp; cuif.branch == 0) else $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);
+    @(posedge CLK)
+    testcase++;//test itype    
+    cuif.opcode=BNE;//BNE
+    //cuif.funct=&#39;0;
+    cuif.zerFlag=1&#39;b0;
+    @(posedge CLK)
+    assert ( cuif.PCSrc == 1 &amp;&amp; cuif.branch==1) else $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);
+    @(posedge CLK)
+    testcase++;//test itype    
+    cuif.opcode=ADDI;//ADDI
+    //cuif.funct=&#39;0;
+    cuif.zerFlag=1&#39;b0;
+    @(posedge CLK)
+    assert (cuif.RegWEN==1&#39;b1 &amp;&amp; cuif.ALUSrc==2&#39;b1) else $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);
+    @(posedge CLK)
+    testcase++;//test itype    
+    cuif.opcode=ANDI;//ANDI
+    //cuif.funct=&#39;0;
+    cuif.zerFlag=1&#39;b0;
+    @(posedge CLK)
+    assert ( cuif.RegWEN==1&#39;b1 &amp;&amp; cuif.ALUSrc==2&#39;b11) else $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);
+    @(posedge CLK)
+    testcase++;//test itype    
+    cuif.opcode=ORI;//ORI
+    //cuif.funct=&#39;0;
+    cuif.zerFlag=1&#39;b0;
+    @(posedge CLK)
+    assert ( cuif.RegWEN==1&#39;b1 &amp;&amp; cuif.ALUSrc==2&#39;b11)else $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);
+    @(posedge CLK)        
+    testcase++;//test itype    
+    cuif.opcode=LUI;//LUI
+    //cuif.funct=&#39;0;
+    cuif.zerFlag=1&#39;b0;
+    @(posedge CLK)
+    assert (cuif.RegWEN==1&#39;b1 &amp;&amp; cuif.DataSrc==2&#39;b10) else $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);
+    @(posedge CLK)
+    testcase++;//test itype    
+    cuif.opcode=HALT;//HALT
+    //cuif.funct=&#39;0;
+    cuif.zerFlag=1&#39;b0;
+    @(posedge CLK)
+    assert (cuif.halt==1&#39;b1)  else $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);    
+    @(posedge CLK)
+    testcase++;//test Rtype    
+    cuif.funct=SLLV;//SLL
+    cuif.opcode=RTYPE;
+    cuif.zerFlag=1&#39;b0;
+    @(posedge CLK)
+    assert ( cuif.RegWEN == 1 &amp;&amp; cuif.RegDest == 1 &amp;&amp; cuif.ALUSrc == 2&#39;b10)else $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);    
+    @(posedge CLK)
+    testcase++;//test Rtype    
+    cuif.funct=SRLV;//SLL
+    cuif.opcode=RTYPE;
+    cuif.zerFlag=1&#39;b0;
+    @(posedge CLK)
+    assert ( cuif.RegWEN ==1 &amp;&amp; cuif.RegDest == 1)else $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);    
+    @(posedge CLK)
+    testcase++;//test Rtype    
+    cuif.funct=ADD;//SLL
+    cuif.opcode=RTYPE;
+    cuif.zerFlag=1&#39;b0;
+    @(posedge CLK)
+    assert ( cuif.RegWEN == 1 &amp;&amp; cuif.RegDest == 1 )else $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);    
+    @(posedge CLK)
+    testcase++;//test Rtype    
+    cuif.funct=ADDU;//SLL
+    cuif.opcode=RTYPE;
+    cuif.zerFlag=1&#39;b0;
+    @(posedge CLK)
+    assert ( cuif.RegWEN == 1 &amp;&amp; cuif.RegDest == 1 )else $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);    
+    @(posedge CLK)
+    testcase++;//test Rtype    
+    cuif.funct=SUBU;//SLL
+    cuif.opcode=RTYPE;
+    cuif.zerFlag=1&#39;b0;
+    @(posedge CLK)
+    assert ( cuif.RegWEN == 1 )else $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);    
+    @(posedge CLK)
+    testcase++;//test Rtype    
+    cuif.funct=SUB;//SLL
+    cuif.opcode=RTYPE;
+    cuif.zerFlag=1&#39;b0;
+
+    @(posedge CLK)
+    assert ( cuif.RegWEN == 1 )else $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);    
+    @(posedge CLK)
+    testcase++;//test Rtype    
+    cuif.funct=AND;//SLL
+    cuif.opcode=RTYPE;
+    cuif.zerFlag=1&#39;b0;
+    @(posedge CLK)
+    assert ( cuif.RegWEN == 1 )else $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);    
+    @(posedge CLK)
+    testcase++;//test Rtype    
+    cuif.funct=OR;//SLL
+    cuif.opcode=RTYPE;
+    cuif.zerFlag=1&#39;b0;
+
+    @(posedge CLK)
+    assert ( cuif.RegWEN == 1 &amp;&amp; cuif.RegDest == 1 )else $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);    
+    @(posedge CLK)
+    testcase++;//test Rtype    
+    cuif.funct=XOR;//SLL
+    cuif.opcode=RTYPE;
+    cuif.zerFlag=1&#39;b0;
+
+    @(posedge CLK)
+    assert ( cuif.RegWEN == 1 &amp;&amp; cuif.RegDest == 1 )  $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);    
+    @(posedge CLK)
+    testcase++;//test Rtype    
+    cuif.funct=NOR;//SLL
+    cuif.opcode=RTYPE;
+    cuif.zerFlag=1&#39;b0;
+
+    @(posedge CLK)
+    assert ( cuif.RegWEN == 1 &amp;&amp; cuif.RegDest == 1 ) else $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);    
+    @(posedge CLK)
+    testcase++;//test Rtype    
+    cuif.funct=SLT;//SLL
+    cuif.opcode=RTYPE;
+    cuif.zerFlag=1&#39;b0;
+
+    @(posedge CLK)
+    assert ( cuif.RegWEN == 1 &amp;&amp; cuif.RegDest == 1 ) else $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);    
+    @(posedge CLK)
+    testcase++;//test Rtype    
+    cuif.funct=SLTU;//SLL
+    cuif.opcode=RTYPE;
+    cuif.zerFlag=1&#39;b0;
+
+    @(posedge CLK)
+    if ( ~(cuif.RegWEN == 1 &amp;&amp; cuif.RegDest == 1 &amp;&amp; cuif.ALUSrc == 2&#39;b10))  $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);    
+    @(posedge CLK)
+    testcase++;//test Rtype    
+    cuif.funct=JR;//JR
+    cuif.opcode=RTYPE;
+    cuif.zerFlag=1&#39;b0;
+    @(posedge CLK)
+    assert (cuif.PCSrc == 2&#39;b10)   $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);    
+    @(posedge CLK)
+    testcase++;//test Rtype    
+    cuif.funct=SUB;//SUB
+    cuif.opcode=RTYPE;
+    cuif.zerFlag=1&#39;b0;
+    @(posedge CLK)
+    assert (cuif.PCSrc == 2&#39;b1 &amp;&amp; cuif.RegWEN == 1 ) else $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);    
+    @(posedge CLK)
+    testcase++;//test Rtype    
+    cuif.funct=SUB;//SUB
+    cuif.opcode=ADDIU;
+    cuif.zerFlag=1&#39;b0;
+    @(posedge CLK)
+    assert (cuif.PCSrc == 2&#39;b1)  $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);    
+
+    @(posedge CLK)
+    testcase++;//test Rtype    
+    cuif.funct=SUB;//SUB
+    cuif.opcode=SLTI;
+    cuif.zerFlag=1&#39;b0;
+    @(posedge CLK)
+    assert (cuif.PCSrc == 2&#39;b1)  $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);    
+    @(posedge CLK)    
+    @(posedge CLK)
+    testcase++;//test Rtype    
+    cuif.funct=SUB;//SUB
+    cuif.opcode=SLTIU;
+    cuif.zerFlag=1&#39;b0;
+    @(posedge CLK)
+    assert (cuif.PCSrc == 2&#39;b1) else $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);    
+    @(posedge CLK)    
+    @(posedge CLK)
+    testcase++;//test Rtype    
+    cuif.funct=SUB;//SUB
+    cuif.opcode=XORI;
+    cuif.zerFlag=1&#39;b0;
+    @(posedge CLK)
+    assert (cuif.ALUSrc == 2&#39;b11)  $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);    
+    @(posedge CLK)    
+    @(posedge CLK)
+    testcase++;//test Rtype    
+    cuif.funct=SUB;//SUB
+    cuif.opcode=LW;
+    cuif.zerFlag=1&#39;b0;
+    @(posedge CLK)
+    assert (cuif.ALUSrc == 2&#39;b11 &amp;&amp;  cuif.DataSrc == 1 )  $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);    
+    @(posedge CLK)
+    @(posedge CLK)
+    testcase++;//test Rtype    
+    cuif.funct=SUB;//SUB
+    cuif.opcode=SW;
+    cuif.zerFlag=1&#39;b0;
+    @(posedge CLK)
+    assert (cuif.ALUSrc == 2&#39;b11 &amp;&amp;  cuif.DataSrc == 1)  $display(&quot;It&#39;s gone wrong addtime %00g ns&quot;,$time);    
+
+    @(posedge CLK)
+    cuif.zerFlag=1&#39;b1;
+    @(posedge CLK)
+    cuif.zerFlag=1&#39;b0;    
+    @(posedge CLK)
+    cuif.ihit=1&#39;b0;    
+    cuif.dhit=1&#39;b0;    
+    @(posedge CLK)
+    cuif.ihit=1&#39;b1;    
+    cuif.dhit=1&#39;b1;
+    @(posedge CLK)
+$finish;                   
+end
+endprogram
+</code></pre>
 <p>以上就是控制单元的代码，接下来就会是一个总的单元用于处理所有小的模块和前面写过的模块。</p>
 
     </div>
@@ -455,7 +999,7 @@
 <div class="copyright">
   
   &copy; 2018 – 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
@@ -465,13 +1009,13 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">59k</span>
+    <span title="站点总字数">55k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">54 分钟</span>
+    <span title="站点阅读时长">50 分钟</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
   </div>

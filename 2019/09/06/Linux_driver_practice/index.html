@@ -250,7 +250,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>3.2k</span>
+              <span>3k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -278,33 +278,150 @@
 <li>加载模组，并尝试测试</li>
 </ol>
 <h1 id="source-文件"><a href="#source-文件" class="headerlink" title="source 文件"></a>source 文件</h1><p>以下是练习写的code，按照基本的几个函数构建的驱动模版。在退出这个驱动的时候运行了printk，在内核中打印了出来。代码如</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> __init <span class="title">hello_init_module</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> misc_register(&amp;hello_miscdevice);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> __exit <span class="title">hello_cleanup_module</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;    </span><br><span class="line">    misc_deregister(&amp;hello_miscdevice);</span><br><span class="line">    printk(KERN_ALERT”Hello__world!n”);<span class="comment">//在内核中打印function，用printk函数</span></span><br><span class="line">    <span class="comment">//return 0;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module_init(hello_init_module);</span><br><span class="line">module_exit(hello_cleanup_module);_</span><br></pre></td></tr></table></figure>
+<pre><code class="c">static int __init hello_init_module(void)
+&#123;
+    return misc_register(&amp;hello_miscdevice);
+&#125;
+
+static void __exit hello_cleanup_module(void)
+&#123;    
+    misc_deregister(&amp;hello_miscdevice);
+    printk(KERN_ALERT”Hello__world!n”);//在内核中打印function，用printk函数
+    //return 0;
+&#125;
+
+module_init(hello_init_module);
+module_exit(hello_cleanup_module);_
+</code></pre>
 <p> 上述代码表现在在卸载模块的时候，会运行打印函数，最后打印在内核中。具体看下面的完成Makefile<br>在完成了source code以后，需要完成makefile进行编辑，更具需要运行的环境，选择相对应环境的编译工具</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">ifneq ($(KERNELRELEASE),)</span><br><span class="line"></span><br><span class="line">obj-m:=hello_new.o</span><br><span class="line"></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#generate the path</span></span><br><span class="line"></span><br><span class="line">CURRENT_PATH:=$(shell pwd)</span><br><span class="line"></span><br><span class="line"><span class="meta">#the absolute path</span></span><br><span class="line"></span><br><span class="line">LINUX_KERNEL_PATH:=/lib/modules/$(shell uname -r)/build</span><br><span class="line"><span class="meta">#complie object</span></span><br><span class="line"><span class="keyword">default</span>:</span><br><span class="line">    make -C $(LINUX_KERNEL_PATH) M=$(CURRENT_PATH) modules </span><br><span class="line">clean:</span><br><span class="line">    make -C $(LINUX_KERNEL_PATH) M=$(CURRENT_PATH) clean</span><br><span class="line">endif</span><br></pre></td></tr></table></figure>
+<pre><code class="c">ifneq ($(KERNELRELEASE),)
+
+obj-m:=hello_new.o
+
+else
+
+#generate the path
+
+CURRENT_PATH:=$(shell pwd)
+
+#the absolute path
+
+LINUX_KERNEL_PATH:=/lib/modules/$(shell uname -r)/build
+#complie object
+default:
+    make -C $(LINUX_KERNEL_PATH) M=$(CURRENT_PATH) modules 
+clean:
+    make -C $(LINUX_KERNEL_PATH) M=$(CURRENT_PATH) clean
+endif
+</code></pre>
 <p> 以上的代码是编译内核模块的makefile代码。Linux_Kernel的地址为运行环境的内核头地址。这次编译是在unbuntu文件运行，所以就如上所示。<br>然后需要在终端输入如下指令。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># <span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/module.h&gt;</span></span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/types.h&gt;</span> </span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/fs.h&gt;</span></span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/version.h&gt;</span></span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/delay.h&gt;</span></span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/crc32.h&gt;</span></span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/interrupt.h&gt;</span></span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/init.h&gt;</span></span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/miscdevice.h&gt;</span></span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/cdev.h&gt;</span> </span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">include</span> <span class="meta-string">&lt;linux/uaccess.h&gt;</span></span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">define</span> DEV_DRIVER_NAME        <span class="meta-string">&quot;HelloDev&quot;</span></span></span><br><span class="line"><span class="keyword">char</span> memory[<span class="number">50</span>]();</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">hello_open</span><span class="params">(struct inode * inode, struct file * file)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">hello_close</span><span class="params">(struct inode * inode, struct file * file)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">ssize_t</span> <span class="title">hello_read</span><span class="params">(struct file *filp, <span class="keyword">char</span> __user *buff, <span class="keyword">size_t</span> count, <span class="keyword">loff_t</span> *pos)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (count &gt; <span class="built_in">strlen</span>(memory))</span><br><span class="line">    &#123;</span><br><span class="line">        count = <span class="built_in">strlen</span>(memory);</span><br><span class="line">    &#125;</span><br><span class="line">  <span class="keyword">if</span> (count &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> -EINVAL;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (copy_to_user(buff,memory,count))&#123;</span><br><span class="line">        <span class="keyword">return</span> EFAULT;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> count;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">ssize_t</span> <span class="title">hello_write</span><span class="params">(struct file *filp, <span class="keyword">const</span> <span class="keyword">char</span> __user *buff, <span class="keyword">size_t</span> count,  <span class="keyword">loff_t</span> *pos)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (count &gt; <span class="built_in">strlen</span>(memory))</span><br><span class="line">    &#123;</span><br><span class="line">        count = <span class="built_in">strlen</span>(memory);</span><br><span class="line">    &#125;</span><br><span class="line">  <span class="keyword">if</span> (count &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> -EINVAL;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (copy_from_user(buff,memory,count))&#123;</span><br><span class="line">        <span class="keyword">return</span> EFAULT;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> count;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">ssize_t</span> <span class="title">hello_ioctl</span><span class="params">(struct inode *inode, struct file *file, <span class="keyword">unsigned</span> <span class="keyword">int</span> cmd, <span class="keyword">unsigned</span> <span class="keyword">long</span> arg)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">ssize_t</span> <span class="title">unlocked_hello_ioctl</span><span class="params">(struct file *file, <span class="keyword">unsigned</span> <span class="keyword">int</span> cmd, <span class="keyword">unsigned</span> <span class="keyword">long</span> arg)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> hello_ioctl(<span class="literal">NULL</span>, file, cmd, arg);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span> <span class="title">hello_fops</span> =</span> &#123;</span><br><span class="line">    .owner            = THIS_MODULE,</span><br><span class="line"><span class="meta"># <span class="meta-keyword">if</span> (LINUX_VERSION_CODE &lt; KERNEL_VERSION( 2,6,35 ))</span></span><br><span class="line">   .ioctl     = hello_ioctl,</span><br><span class="line"><span class="meta"># <span class="meta-keyword">else</span></span></span><br><span class="line">   .unlocked_ioctl = unlocked_hello_ioctl,</span><br><span class="line"><span class="meta"># <span class="meta-keyword">endif</span><span class="comment">//版本号决定ioct的不同么，但是为什么用编译条件 不直接用if</span></span></span><br><span class="line">    .open        = hello_open,</span><br><span class="line">    .release    = hello_close,</span><br><span class="line">    .read       = hello_read,</span><br><span class="line">    .write      = hello_write</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">miscdevice</span> <span class="title">hello_miscdevice</span> =</span> &#123;</span><br><span class="line">    MISC_DYNAMIC_MINOR,<span class="comment">//次设备号</span></span><br><span class="line">    DEV_DRIVER_NAME,</span><br><span class="line">    &amp;hello_fops,<span class="comment">//这个为什么是地址的格式</span></span><br><span class="line">&#125;;<span class="comment">//.minor,.name，.fops 可以省略是吗</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> __init <span class="title">hello_init_module</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> misc_register(&amp;hello_miscdevice);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> __exit <span class="title">hello_cleanup_module</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;    </span><br><span class="line">    misc_deregister(&amp;hello_miscdevice);</span><br><span class="line">    printk(KERN_ALERT”Hello__world!n”);</span><br><span class="line">    <span class="comment">//return 0;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module_init(hello_init_module);</span><br><span class="line">module_exit(hello_cleanup_module);_</span><br></pre></td></tr></table></figure>
+<pre><code class="c"># include &lt;linux/module.h&gt;
+# include &lt;linux/types.h&gt; 
+# include &lt;linux/fs.h&gt;
+# include &lt;linux/version.h&gt;
+# include &lt;linux/delay.h&gt;
+# include &lt;linux/crc32.h&gt;
+# include &lt;linux/interrupt.h&gt;
+# include &lt;linux/init.h&gt;
+# include &lt;linux/miscdevice.h&gt;
+# include &lt;linux/cdev.h&gt; 
+# include &lt;linux/uaccess.h&gt;
+# define DEV_DRIVER_NAME        &quot;HelloDev&quot;
+char memory[50]();
+
+int hello_open(struct inode * inode, struct file * file)
+&#123;
+    return 0;
+&#125;
+
+int hello_close(struct inode * inode, struct file * file)
+&#123;
+    return 0;
+&#125;
+
+ssize_t hello_read(struct file *filp, char __user *buff, size_t count, loff_t *pos)
+&#123;
+    if (count &gt; strlen(memory))
+    &#123;
+        count = strlen(memory);
+    &#125;
+  if (count &lt; 0)
+    &#123;
+        return -EINVAL;
+    &#125;
+    if (copy_to_user(buff,memory,count))&#123;
+        return EFAULT;
+    &#125;
+
+    return count;
 
 
+&#125;
+
+ssize_t hello_write(struct file *filp, const char __user *buff, size_t count,  loff_t *pos)
+&#123;
+
+if (count &gt; strlen(memory))
+    &#123;
+        count = strlen(memory);
+    &#125;
+  if (count &lt; 0)
+    &#123;
+        return -EINVAL;
+    &#125;
+    if (copy_from_user(buff,memory,count))&#123;
+        return EFAULT;
+    &#125;
+    return count;
+
+&#125;
 
 
+ssize_t hello_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned long arg)
+&#123;
+    return 0;
+&#125;
+
+ssize_t unlocked_hello_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
+&#123;
+    return hello_ioctl(NULL, file, cmd, arg);
+&#125;
+
+static struct file_operations hello_fops = &#123;
+    .owner            = THIS_MODULE,
+# if (LINUX_VERSION_CODE &lt; KERNEL_VERSION( 2,6,35 ))
+   .ioctl     = hello_ioctl,
+# else
+   .unlocked_ioctl = unlocked_hello_ioctl,
+# endif//版本号决定ioct的不同么，但是为什么用编译条件 不直接用if
+    .open        = hello_open,
+    .release    = hello_close,
+    .read       = hello_read,
+    .write      = hello_write
+&#125;;
 
 
+static struct miscdevice hello_miscdevice = &#123;
+    MISC_DYNAMIC_MINOR,//次设备号
+    DEV_DRIVER_NAME,
+    &amp;hello_fops,//这个为什么是地址的格式
+&#125;;//.minor,.name，.fops 可以省略是吗
 
+static int __init hello_init_module(void)
+&#123;
+    return misc_register(&amp;hello_miscdevice);
+&#125;
 
+static void __exit hello_cleanup_module(void)
+&#123;    
+    misc_deregister(&amp;hello_miscdevice);
+    printk(KERN_ALERT”Hello__world!n”);
+    //return 0;
+&#125;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+module_init(hello_init_module);
+module_exit(hello_cleanup_module);_
+</code></pre>
 
     </div>
 
@@ -456,7 +573,7 @@
 <div class="copyright">
   
   &copy; 2018 – 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
@@ -466,13 +583,13 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">59k</span>
+    <span title="站点总字数">55k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">54 分钟</span>
+    <span title="站点阅读时长">50 分钟</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
   </div>

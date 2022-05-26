@@ -250,7 +250,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>546</span>
+              <span>545</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -273,7 +273,8 @@
         <h1 id="简介（非正式）"><a href="#简介（非正式）" class="headerlink" title="简介（非正式）"></a>简介（非正式）</h1><p>最近在直播学习整理，正好觉得直播间太单调，整了个弹幕机。</p>
 <h1 id="大概构思"><a href="#大概构思" class="headerlink" title="大概构思"></a>大概构思</h1><p>需要先收集弹幕信息，然后根据相应的弹幕自动回复预设的答案。</p>
 <h1 id="1-收集弹幕信息"><a href="#1-收集弹幕信息" class="headerlink" title="1.收集弹幕信息"></a>1.收集弹幕信息</h1><p>运用Python中request库post的协议获取输入直播间的弹幕。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">req = requests.post(url, data=data,headers=headers)</span><br></pre></td></tr></table></figure>
+<pre><code class="python">    req = requests.post(url, data=data,headers=headers)
+</code></pre>
 <p>url是进入直播间网络版本，然后开发者工具中Network中的gethistory获取的。<br><img src="https://res.cloudinary.com/db6zr5nzu/image/upload/v1623823716/gethistoryRespond_zrikby.png" alt="gethistoryResspond"><br>然后捕获的数据如下图所示。<br><img src="https://res.cloudinary.com/db6zr5nzu/image/upload/v1623824607/data_lkwxlz.png" alt="Data"><br>于是用Python中的json.loads把json字符串转换成可以处理的形式。然后用两个字典形式就能直接获取信息，然后我只爬取了发弹幕的时间，名称和内容。最后制作成如下形式。<br><img src="https://res.cloudinary.com/db6zr5nzu/image/upload/v1623824607/data_lkwxlz.png" alt="Data"></p>
 <h1 id="2-发送弹幕"><a href="#2-发送弹幕" class="headerlink" title="2.发送弹幕"></a>2.发送弹幕</h1><p>这个根据网上的方法需要先在直播间发送一条弹幕，然后在Network中搜索send标签，然后需要获取send中很多header的数据和本账户的cookie，最后可以用这个数据模拟用户发弹幕的场景。（前几天不小心把cookie传到github上了…第二天名字就被人改了= =）</p>
 <h1 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h1><p>参考了如何爬取弹幕。<br><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1nT4y1E7a3?from=search&amp;seid=13430385489445432762">https://www.bilibili.com/video/BV1nT4y1E7a3?from=search&amp;seid=13430385489445432762</a></p>
@@ -427,7 +428,7 @@
 <div class="copyright">
   
   &copy; 2018 – 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
@@ -437,13 +438,13 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">59k</span>
+    <span title="站点总字数">55k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">54 分钟</span>
+    <span title="站点阅读时长">50 分钟</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
   </div>

@@ -277,7 +277,9 @@
 </li>
 <li><p>自动创建</p>
 <h2 id="手工创建"><a href="#手工创建" class="headerlink" title="手工创建"></a>手工创建</h2><p>利用mknod 函数进行手工创建</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mknod filename <span class="built_in">type</span> major minor</span><br></pre></td></tr></table></figure></li>
+<pre><code class="bash">mknod filename type major minor
+</code></pre>
+</li>
 <li><p>filename  设备文件名字</p>
 </li>
 <li><p>type         设备文件类型</p>
@@ -292,7 +294,16 @@
 <ul>
 <li>Struct file</li>
 <li>Struct inode</li>
-<li>Struct file_operations<h2 id="Struct-file"><a href="#Struct-file" class="headerlink" title="Struct file"></a>Struct file</h2> 这个数据结构代表的是一个打开的文件。系统中每个打开的文件在内核空间都有一个关联的struct file 。它由内核在打开文件时创建，在文件关闭后释放。 <h2 id="Struct-inode"><a href="#Struct-inode" class="headerlink" title="Struct inode"></a>Struct inode</h2>用来记录文件的物理上的信息，例如文件大小，文件归属，文件权限等等。<h2 id="Struct-file-operations"><a href="#Struct-file-operations" class="headerlink" title="Struct file_operations"></a>Struct file_operations</h2>一个函数指针的集合，定义能在设备上进行的操作。结构中的成员指向驱动中的函数，这些函数实现一个特别的操作，对于不支持的操作保留为NULL。 <h3 id="定义如下"><a href="#定义如下" class="headerlink" title="定义如下"></a>定义如下</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span> <span class="title">shumg_fops</span> =</span> &#123;</span><br><span class="line">  .owner = THIS_MODULE,</span><br><span class="line">  .ioctl  =  shumg_ioctl,<span class="comment">//读写外其他操作</span></span><br><span class="line">  .write  =  shumg_write,<span class="comment">//写</span></span><br><span class="line">  .read  =  shumg_read,<span class="comment">//读</span></span><br><span class="line">  .open  =  shumg_open,<span class="comment">//打开</span></span><br><span class="line">  .release =  shumg_release,<span class="comment">//关闭</span></span><br><span class="line">&#125;；</span><br></pre></td></tr></table></figure></li>
+<li>Struct file_operations<h2 id="Struct-file"><a href="#Struct-file" class="headerlink" title="Struct file"></a>Struct file</h2> 这个数据结构代表的是一个打开的文件。系统中每个打开的文件在内核空间都有一个关联的struct file 。它由内核在打开文件时创建，在文件关闭后释放。 <h2 id="Struct-inode"><a href="#Struct-inode" class="headerlink" title="Struct inode"></a>Struct inode</h2>用来记录文件的物理上的信息，例如文件大小，文件归属，文件权限等等。<h2 id="Struct-file-operations"><a href="#Struct-file-operations" class="headerlink" title="Struct file_operations"></a>Struct file_operations</h2>一个函数指针的集合，定义能在设备上进行的操作。结构中的成员指向驱动中的函数，这些函数实现一个特别的操作，对于不支持的操作保留为NULL。 <h3 id="定义如下"><a href="#定义如下" class="headerlink" title="定义如下"></a>定义如下</h3><pre><code class="c">static struct file_operations shumg_fops = &#123;
+  .owner = THIS_MODULE,
+  .ioctl  =  shumg_ioctl,//读写外其他操作
+  .write  =  shumg_write,//写
+  .read  =  shumg_read,//读
+  .open  =  shumg_open,//打开
+  .release =  shumg_release,//关闭
+&#125;；
+</code></pre>
+</li>
 </ul>
 <h1 id="各个函数介绍"><a href="#各个函数介绍" class="headerlink" title="各个函数介绍"></a>各个函数介绍</h1><ul>
 <li>open</li>
@@ -301,14 +312,16 @@
 <li>write</li>
 <li>ioctl</li>
 </ul>
-<h2 id="open函数"><a href="#open函数" class="headerlink" title="open函数"></a>open函数</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> (*open) (struct inode *，struct file *)；</span><br></pre></td></tr></table></figure>
+<h2 id="open函数"><a href="#open函数" class="headerlink" title="open函数"></a>open函数</h2><pre><code class="c"> int (*open) (struct inode *，struct file *)；
+</code></pre>
 <p>尽管这常常是对设备文件进行的第一个操作， 不要求驱动声明一个对应的方法。 如果这个项是 NULL，设备打开一直成功，但是你的驱动不会得到通知。</p>
 <p>Open的作用通常初始化了设备，并表明次设备号</p>
-<h2 id="release-close函数"><a href="#release-close函数" class="headerlink" title="release/close函数"></a>release/close函数</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> (*release) (struct inode *， struct file *)；</span><br></pre></td></tr></table></figure>
+<h2 id="release-close函数"><a href="#release-close函数" class="headerlink" title="release/close函数"></a>release/close函数</h2><pre><code class="c">int (*release) (struct inode *， struct file *)；
+</code></pre>
 <p>尽管这常常是对设备文件进行的第一个操作， 不要求驱动声明一个对应的方法。 如果这个项是 NULL，设备打开一直成功，但是你的驱动不会得到通知。</p>
 <p>Release的作用通常与Open相反。</p>
-<h2 id="read函数"><a href="#read函数" class="headerlink" title="read函数"></a>read函数</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">ssize_t</span> <span class="title">write</span><span class="params">(<span class="keyword">int</span> fd,  <span class="keyword">void</span> *buf, <span class="keyword">size_t</span> count)</span></span>;</span><br></pre></td></tr></table></figure>
-
+<h2 id="read函数"><a href="#read函数" class="headerlink" title="read函数"></a>read函数</h2><pre><code class="c">ssize_t write(int fd,  void *buf, size_t count);
+</code></pre>
 <h3 id="具体作用"><a href="#具体作用" class="headerlink" title="具体作用"></a>具体作用</h3><p>从设备中读取数据。</p>
 <h3 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h3><p>ssize_t在位数不同的操作系统下位数没有变化。</p>
 <ul>
@@ -321,15 +334,17 @@
 <li>返回值为负数，表示出现错误，并且指明是何种错误。</li>
 <li>在阻塞型 io 中，read 调用会出现阻塞。</li>
 </ul>
-<h2 id="write函数"><a href="#write函数" class="headerlink" title="write函数"></a>write函数</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">ssize_t</span> <span class="title">write</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">void</span> *buf, <span class="keyword">size_t</span> count)</span></span>;</span><br></pre></td></tr></table></figure>
-
+<h2 id="write函数"><a href="#write函数" class="headerlink" title="write函数"></a>write函数</h2><pre><code class="c">ssize_t write(int fd, const void *buf, size_t count);
+</code></pre>
 <h3 id="具体作用-1"><a href="#具体作用-1" class="headerlink" title="具体作用"></a>具体作用</h3><p>向设备发送数据。</p>
 <h3 id="返回值-1"><a href="#返回值-1" class="headerlink" title="返回值"></a>返回值</h3><ul>
 <li>返回值等于传递给 write 系统调用的count 参数，表明请求的数据传输成功。</li>
 <li>返回值大于 0，但小于传递给write 系统调用的count 参数，表明部分数据传输成功，根据设备的不同，导致这个问题的原因也不同，一般采取再次读取的方法。</li>
 <li>返回值＝0，表示没有写入任何数据。标准库在调用write 时，出现这种情况会重复调用write。</li>
 <li>返回值为负数，表示出现错误，并且指明是何种错误。错误号的定义参见&lt;linux/ errno.h&gt;</li>
-<li>在阻塞型 io 中，write 调用会出现阻塞。<h2 id="ioctl函数"><a href="#ioctl函数" class="headerlink" title="ioctl函数"></a>ioctl函数</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span>(*ioctl) (struct inode *inode,struct file *file,<span class="keyword">unsigned</span> <span class="keyword">int</span> cmd,<span class="keyword">unsigned</span> <span class="keyword">long</span> arg ) </span><br></pre></td></tr></table></figure></li>
+<li>在阻塞型 io 中，write 调用会出现阻塞。<h2 id="ioctl函数"><a href="#ioctl函数" class="headerlink" title="ioctl函数"></a>ioctl函数</h2><pre><code class="c">int(*ioctl) (struct inode *inode,struct file *file,unsigned int cmd,unsigned long arg ) 
+</code></pre>
+</li>
 </ul>
 <h3 id="参数-1"><a href="#参数-1" class="headerlink" title="参数"></a>参数</h3><ul>
 <li>inode：文件物理信息</li>
@@ -488,7 +503,7 @@
 <div class="copyright">
   
   &copy; 2018 – 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
@@ -498,13 +513,13 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">59k</span>
+    <span title="站点总字数">55k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">54 分钟</span>
+    <span title="站点阅读时长">50 分钟</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
   </div>

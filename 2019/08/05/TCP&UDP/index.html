@@ -262,7 +262,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>3.1k</span>
+              <span>3k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -299,7 +299,41 @@
 <li>linux我选择是iperf3（最后又借助telnet测试是否联通）<h3 id="b-1）进行-1-gt-2-互联"><a href="#b-1）进行-1-gt-2-互联" class="headerlink" title="b.1）进行 1 -&gt; 2 互联"></a>b.1）进行 1 -&gt; 2 互联</h3>Mac端异米网络工具<br><img src="https://res.cloudinary.com/djyodckal/image/upload/v1564988408/WechatIMG12_zcetsn.jpg"><br>Windows段TCP&amp;UDP测试工具<br><img src="https://res.cloudinary.com/djyodckal/image/upload/v1564988410/WechatIMG13_kg4ia3.jpg"><br>配置如上图所示<br>位于内网的mac端访问外网Windows端之间输入目标IP就可直接访问，（端口不一样好像也能访问，但是可能是只有两台设备的原因）而位于外网的设备访问内网就得输入路由器WAN口的IP地址也就是之前关于网络静态的设置IP再加上防火墙上设置的端口转移的端口号。然后在两端都有接收到信息。<h3 id="b-2）进行1-gt-3互联"><a href="#b-2）进行1-gt-3互联" class="headerlink" title="b.2）进行1-&gt; 3互联"></a>b.2）进行1-&gt; 3互联</h3>这次用了iperf 2.0 java版本进行互联<br><img src="https://res.cloudinary.com/djyodckal/image/upload/v1564988412/WechatIMG16_msnbpa.jpg"><br>这次用了iperf3 ubuntu命令行<br><code>iperf3 -c 192.169.232.2 -f -k</code><br>上两图图是以windows外网作为服务端，所建立的连接</li>
 </ol>
 <p> <em>这里用iperf2和iperf3互联一定要打开jperf2中“Enable Compatibility Mode”，因为两个版本不同。</em><br><img src="https://res.cloudinary.com/djyodckal/image/upload/v1564988412/WechatIMG17_cyaqh3.jpg"><br>最后附上一张测试带宽的图，配上输出的文本，用python算出了最大带宽。<br><img src="https://res.cloudinary.com/djyodckal/image/upload/v1564988414/WechatIMG20_g6a2ov.jpg"><br>实现代码如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os      <span class="comment"># List of  module  import  statements</span></span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line">DataPath = os.path.expanduser(<span class="string">&#x27;/Volumes/CENA_X64FRE&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">findMaxBandwidth</span>(<span class="params">name</span>):</span></span><br><span class="line">filename1 = DataPath + name</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(filename1) <span class="keyword">as</span> f:</span><br><span class="line">lines1 = f.read().splitlines()</span><br><span class="line">patternIP = <span class="string">&quot;[0-9]()&#123;1,3&#125;[.]()[0-9]()&#123;1,3&#125;[.]()[0-9]()&#123;1,3&#125;[.]()[0-9]()&#123;1,3&#125;&quot;</span></span><br><span class="line">IPs = re.findall(patternIP,lines1[<span class="number">5</span>]()+lines1[<span class="number">6</span>]())</span><br><span class="line">patternBandWidth = <span class="string">&quot;[0-9]()+[ \t]()Kbits/sec&quot;</span></span><br><span class="line">i = <span class="number">0</span></span><br><span class="line">bandwidthList =[]()</span><br><span class="line"><span class="keyword">while</span> i \&lt; <span class="built_in">len</span>(lines1):</span><br><span class="line">bandwidth = re.findall(patternBandWidth,lines1[i]())</span><br><span class="line"><span class="keyword">if</span> bandwidth != []():</span><br><span class="line">bandwidthList.append(<span class="built_in">int</span>(bandwidth[<span class="number">0</span>]().split(<span class="string">&#x27; &#x27;</span>)[<span class="number">0</span>]()))</span><br><span class="line">i += <span class="number">1</span></span><br><span class="line">MaxBandwidth = <span class="built_in">max</span>(bandwidthList)</span><br><span class="line"><span class="keyword">return</span> (IPs,MaxBandwidth)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__  == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">answer = findMaxBandwidth(<span class="string">&quot;/TCP_WANtoLAN&quot;</span>)</span><br><span class="line">IPs = answer[<span class="number">0</span>]()</span><br><span class="line">MaxBandwidth = answer[<span class="number">1</span>]()</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;TCP: &quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Local IP: &quot;</span> + IPs[<span class="number">0</span>]() + <span class="string">&quot; destinated IP: &quot;</span> + IPs[<span class="number">1</span>]())</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;bandwidth: &quot;</span> + <span class="built_in">str</span>(<span class="built_in">round</span>(<span class="built_in">int</span>(MaxBandwidth)/<span class="number">1024.0</span>,<span class="number">2</span>))+ <span class="string">&#x27;M/s&#x27;</span>)</span><br><span class="line">answer2 = findMaxBandwidth(<span class="string">&quot;/UDP_WANtoLAN&quot;</span>)</span><br><span class="line">IPs2 = answer2[<span class="number">0</span>]()</span><br><span class="line">MaxBandwidth2 = answer2[<span class="number">1</span>]()</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;UDP: &quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Local IP: &quot;</span> + IPs2[<span class="number">0</span>]() + <span class="string">&quot; destinated IP: &quot;</span> + IPs2[<span class="number">1</span>]())</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;bandwidth: &quot;</span> + <span class="built_in">str</span>(<span class="built_in">round</span>(<span class="built_in">int</span>(MaxBandwidth2)/<span class="number">1024.0</span>,<span class="number">2</span>))+<span class="string">&#x27;M/s&#x27;</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<pre><code class="python">import os      # List of  module  import  statements
+import re
+DataPath = os.path.expanduser(&#39;/Volumes/CENA_X64FRE&#39;)
+
+def findMaxBandwidth(name):
+filename1 = DataPath + name
+with open(filename1) as f:
+lines1 = f.read().splitlines()
+patternIP = &quot;[0-9]()&#123;1,3&#125;[.]()[0-9]()&#123;1,3&#125;[.]()[0-9]()&#123;1,3&#125;[.]()[0-9]()&#123;1,3&#125;&quot;
+IPs = re.findall(patternIP,lines1[5]()+lines1[6]())
+patternBandWidth = &quot;[0-9]()+[ \t]()Kbits/sec&quot;
+i = 0
+bandwidthList =[]()
+while i \&lt; len(lines1):
+bandwidth = re.findall(patternBandWidth,lines1[i]())
+if bandwidth != []():
+bandwidthList.append(int(bandwidth[0]().split(&#39; &#39;)[0]()))
+i += 1
+MaxBandwidth = max(bandwidthList)
+return (IPs,MaxBandwidth)
+
+if __name__  == &quot;__main__&quot;:
+answer = findMaxBandwidth(&quot;/TCP_WANtoLAN&quot;)
+IPs = answer[0]()
+MaxBandwidth = answer[1]()
+print(&quot;TCP: &quot;)
+print(&quot;Local IP: &quot; + IPs[0]() + &quot; destinated IP: &quot; + IPs[1]())
+print(&quot;bandwidth: &quot; + str(round(int(MaxBandwidth)/1024.0,2))+ &#39;M/s&#39;)
+answer2 = findMaxBandwidth(&quot;/UDP_WANtoLAN&quot;)
+IPs2 = answer2[0]()
+MaxBandwidth2 = answer2[1]()
+print(&quot;UDP: &quot;)
+print(&quot;Local IP: &quot; + IPs2[0]() + &quot; destinated IP: &quot; + IPs2[1]())
+print(&quot;bandwidth: &quot; + str(round(int(MaxBandwidth2)/1024.0,2))+&#39;M/s&#39;)
+</code></pre>
 <p>至此网络协议相关就结束了</p>
 
     </div>
@@ -321,8 +355,8 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2019/08/02/STM32(1)/" rel="prev" title="STM32 C编程入门记录 Timers(上)">
-      <i class="fa fa-chevron-left"></i> STM32 C编程入门记录 Timers(上)
+    <a href="/2019/08/02/python(delete_space)/" rel="prev" title="Python读取文件去掉空格读取数据方法">
+      <i class="fa fa-chevron-left"></i> Python读取文件去掉空格读取数据方法
     </a></div>
       <div class="post-nav-item">
     <a href="/2019/08/09/linux-driver1/" rel="next" title="Linux内核驱动介绍(1)">
@@ -453,7 +487,7 @@
 <div class="copyright">
   
   &copy; 2018 – 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
@@ -463,13 +497,13 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">59k</span>
+    <span title="站点总字数">55k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">54 分钟</span>
+    <span title="站点阅读时长">50 分钟</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
   </div>
